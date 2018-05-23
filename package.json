@@ -1,0 +1,36 @@
+{
+  "name": "sketch-kit",
+  "version": "1.0.0",
+  "description": "Rapid prototyping framework for HTML5",
+  "main": "index.js",
+  "bin": {
+    "sketch-kit": "index.js"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/k-may/sketch-kit.git"
+  },
+  "keywords": [
+    "prototyping",
+    "HTML5",
+    "kit"
+  ],
+  "author": "k-may",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/k-may/sketch-kit/issues"
+  },
+  "homepage": "https://github.com/k-may/sketch-kit#readme",
+  "devDependencies": {
+    "browser-sync": "^2.24.4",
+    "fs-extra": "^6.0.1",
+    "inquirer": "^5.2.0",
+    "path": "^0.12.7",
+    "replace": "^1.0.0",
+    "webpack": "^4.8.3"
+  }
+}
