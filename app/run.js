@@ -45,10 +45,12 @@ class Run {
 
         var toolsDir = path.resolve(__dirname, '../tools/build');
 
+
         for (var i = 0, len = options.tasks.length; i < len; i++) {
             task = options.tasks[i];
-            name = options.type + ':' + task;
-            var taskPath = path.resolve(toolsDir, options.type, task);
+            name = task;
+            var taskPath = path.resolve(toolsDir, task);
+            console.log(taskPath);
             gulp.task(name, require(taskPath)(gulp, plugins, this._tasksConfig, 'local'));
             tasks.push(name);
         }

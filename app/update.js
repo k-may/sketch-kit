@@ -1,5 +1,6 @@
 var fs = require('fs-extra');
-var pkg = require('./sketches/package.json');
+var webpack = require('webpack');
+var path = require('path');
 
 class Update {
 
@@ -23,19 +24,19 @@ class Update {
 
     _getWebkitConfig(pkg) {
 
+        var rP =  path.resolve(process.cwd(), "sketches/js/vendor");
+
         return {
             entry: {
-                vendor: Object.keys(pkg.dependencies)
+                vendor: Object.keys(pkg)
             },
             output: {
                 filename: 'vendor.js',
                 library: '[name]',
-                path: (environmentData.environment === 'local') ? path.resolve(config.js.dest) : path.resolve(config.release.dest + '/js')
+                path: rP
             },
             resolve: {
-                alias: config.js.alias,
                 modules: [
-                    path.resolve(config.js.src),
                     'node_modules'
                 ]
             },
@@ -50,15 +51,16 @@ class Update {
         //first search for parent deps
         return new Promise((resolve, reject) => {
 
-            var package;
-            this._getFile('package.json').then(file => {
-                var deps = file.dependencies;
+            var deps = {};
+            this._getFile('package.json').then(d => {
 
-                console.log(deps);
-                this._getFile("./sketches/package.json").then(file => {
-                    var deps = file.dependencies;
+                deps = d || {};
 
-                    console.log(deps);
+                this._getFile("sketches/package.json").then(d => {
+
+                    if(d)
+                        Object.assign(d, deps);
+
                     resolve(deps);
                 });
 
@@ -68,11 +70,14 @@ class Update {
 
     _getFile(src) {
         return new Promise(resolve => {
-            fs.readFile('package.json', function (err, data) {
+            fs.readFile('package.json', 'utf8', function (err, data) {
                 if (err)
-                    reject(new Error(err.message));
-                else
+                    resolve({});
+                else {
+                    data = JSON.parse(data);
+                    data = data.dependencies || {};
                     resolve(data);
+                }
             });
 
         });

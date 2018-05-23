@@ -9,6 +9,8 @@ var s = new Sketches();
 var action = argv._.shift();
 var args = argv._;
 
+console.log(action);
+
 switch (action) {
     case 'create':
         s.create(args);

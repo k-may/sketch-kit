@@ -1,4 +1,5 @@
 var fs = require('fs-extra');
+var U = require('./update');
 
 class Sketch {
 
@@ -23,6 +24,7 @@ class Sketch {
      * Prompts for info and appends new sketch to sketches
      */
     create(args) {
+
         if (this._IsInitialized()) {
             var Create = require("./create");
             new Create(this.config, args);
@@ -46,10 +48,18 @@ class Sketch {
      * @returns {Promise}
      */
     update() {
+
         return new Promise((resolve, reject) => {
+
+
             if (this._IsInitialized()) {
-                var Update = require('./update');
-                var update = new Update(this.config);
+
+
+                console.log("start!");
+
+                var update = new U(this.config);
+
+
                 update.start().then(() => {
                     resolve();
                 });
@@ -66,7 +76,6 @@ class Sketch {
      */
     run(args) {
         this.update().then(() => {
-
             var Run = require('./run');
             new Run(this.config, args);
         }).catch((e) => {
