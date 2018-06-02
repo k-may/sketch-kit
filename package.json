@@ -34,7 +34,6 @@
     "gulp-plumber": "^1.2.0",
     "gulp-sass": "^4.0.1",
     "gulp-sass-glob": "^1.0.9",
-    "gulp-sourcemaps": "^2.6.4",
     "gulp-sync": "^0.1.4",
     "inquirer": "^5.2.0",
     "path": "^0.12.7",
