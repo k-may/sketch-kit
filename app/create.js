@@ -106,7 +106,7 @@ class Create {
         return new Promise((resolve, reject) => {
             var txt = 'window.classes = window.classes || {};\n';
             for (var id in this.sketchConfig.sketches) {
-                txt += 'import ' + id + '  from "./views/sketches/' + id + ' /' + id + ' .js";window.classes.' + id + '  = ' + id + ' ;\n'
+                txt += 'import ' + id + '  from "./views/sketches/' + id + '/' + id + '.js";window.classes.' + id + ' = ' + id + ' ;\n'
             }
             var jsPath = "./sketches/js/sketches.js";
             fs.writeFile(jsPath, txt, {}, err => {
