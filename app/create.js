@@ -14,7 +14,7 @@ class Create {
         var sketchConfigPath = this.config.root + "/data/config.json";
         this.sketchConfig = fs.readJSONSync(sketchConfigPath);
 
-        if(args.length == 1)
+        if (args.length == 1)
             this._createSketch(args[0], os.userInfo().username);
         else
             this._prompt();
@@ -48,11 +48,11 @@ class Create {
                     }
 
                 });
-            }else if(name === ""){
+            } else if (name === "") {
                 console.log("Name not valid");
                 this._prompt();
             }
-             else {
+            else {
                 this._createSketch(name, author);
             }
 
@@ -71,44 +71,67 @@ class Create {
      */
     _createSketch(name, author) {
 
-        var templatePath = path.resolve(__dirname, "../");
-        templatePath = path.join(templatePath, "/lib/sketches/js/views/sketches/template");
         var sketchesPath = './sketches/js/views/sketches/' + name;
 
         this._createTemplate(name)
             .then(() => {
+                return this._createSassFile(name);
+            }).then(() => {
 
-                this._createSassFile(name).then(() => {
+            //replace all sketchnames throughout template
+            replace({
+                regex: "{sketchname}",
+                replacement: name,
+                paths: [sketchesPath],
+                recursive: true,
+                silent: true,
+            });
 
-                    //replace all sketchnames throughout template
-                    replace({
-                        regex: "{sketchname}",
-                        replacement: name,
-                        paths: [sketchesPath],
-                        recursive: true,
-                        silent: true,
-                    });
+            //add new sketch config to sketches/data/config.json
+            this.sketchConfig.sketches[name] = {
+                "view": name + "/SketchView",
+                "date": new Date(),
+                "author": author
+            };
 
-                    //add new sketch config to sketches/data/config.json
-                    this.sketchConfig.sketches[name] = {
-                        "view": name + "/SketchView",
-                        "date": new Date(),
-                        "author": author
-                    };
+            var sketchConfigPath = this.config.root + "/data/config.json";
+            fs.writeFile(sketchConfigPath, JSON.stringify(this.sketchConfig, null, 4));
 
-                    var sketchConfigPath = this.config.root + "/data/config.json";
-                    fs.writeFile(sketchConfigPath, JSON.stringify(this.sketchConfig, null, 4));
+            this._createClassesProxy(name);
+        });
+    }
 
-                });
-            })
 
+    _createClassesProxy() {
+        return new Promise((resolve, reject) => {
+            var txt = 'window.classes = window.classes || {};\n';
+            for (var id in this.sketchConfig.sketches) {
+                txt += 'import ' + id + '  from "./views/sketches/' + id + ' /' + id + ' .js";window.classes.' + id + '  = ' + id + ' ;\n'
+            }
+            var jsPath = "./sketches/js/sketches.js";
+            fs.writeFile(jsPath, txt, {}, err => {
+                if (err) reject("Classes proxy error : " + err.message);
+                resolve();
+            });
+        });
     }
 
     _createTemplate(name) {
-        var templatePath = path.resolve(__dirname, "../");
-        templatePath = path.join(templatePath, "/lib/sketches/js/views/sketches/template");
-        var sketchesPath = './sketches/js/views/sketches/' + name;
-        return fs.copy(templatePath, sketchesPath);
+
+        return new Promise((resolve, reject) => {
+            var templatePath = path.resolve(__dirname, "../");
+            templatePath = path.join(templatePath, "/lib/sketches/js/views/sketches/template");
+            var sketchesPath = './sketches/js/views/sketches/' + name;
+            fs.copy(templatePath, sketchesPath).then(() => {
+                var fileName = sketchesPath + "/SketchView.js";
+                var newName = sketchesPath + "/" + name + ".js";
+                fs.rename(fileName, newName, err => {
+                    if (err) reject();
+
+                    resolve();
+                });
+            });
+        });
     }
 
     _createSassFile(name) {
@@ -121,8 +144,8 @@ class Create {
         });
     }
 
-    _getSassTemplate(name){
-        return  "." + name + "{ canvas { display:block; position : fixed; }}"
+    _getSassTemplate(name) {
+        return "." + name + "{ canvas { display:block; position : fixed; }}"
     }
 
     _getPromptConfig() {
@@ -139,6 +162,7 @@ class Create {
         }];
 
     }
-};
+}
+;
 
 module.exports = Create;

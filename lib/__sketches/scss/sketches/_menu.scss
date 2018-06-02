@@ -1,0 +1,55 @@
+.menu {
+
+  position: fixed;
+  z-index: 1000;
+
+  ul {
+    position: absolute;
+    top: 0;
+    z-index: 200;
+    font-size: 13px;
+    padding-left: 20px;
+
+    button {
+      margin: 4px 0;
+      width: 22px;
+      height: 22px;
+      background-color: rgba(238, 238, 238, 0.7);
+      border: none;
+      border-radius: 0;
+    }
+
+    li {
+      white-space: nowrap;
+      display: none;
+      width: auto;
+      margin: 4px 0;
+      list-style-type: none;
+      background: rgba(27, 27, 27, 0.49);
+      cursor: pointer;
+      padding: 3px 14px;
+      color: #fff;
+
+      &.active {
+        background: rgba(228, 228, 228, 0.72);
+      }
+
+      &:hover {
+        background: rgba(238, 238, 238, 0.7);
+      }
+
+    }
+
+  }
+
+  &:hover {
+    button {
+      display: none;
+    }
+
+    li {
+      display: block;
+    }
+  }
+
+}

@@ -10,10 +10,13 @@ class Update {
 
     start() {
         //todo run webpack
-        return new Promise(resolve => {
+        return new Promise((resolve, reject) => {
             this._getDependencies().then(deps => {
                 var webpackConfig = this._getWebkitConfig(deps);
                 webpack(webpackConfig, function (error, stats) {
+                    if (error) reject('webpack error :', error);
+                    var statsErrors = stats.toString('errors-only');
+                    if (statsErrors) console.log(statsErrors);
                     resolve();
                 });
             });
@@ -24,7 +27,7 @@ class Update {
 
     _getWebkitConfig(pkg) {
 
-        var rP =  path.resolve(process.cwd(), "sketches/js/vendor");
+        var rP = path.resolve(process.cwd(), "sketches/js/vendor");
 
         return {
             entry: {
@@ -58,7 +61,7 @@ class Update {
 
                 this._getFile("sketches/package.json").then(d => {
 
-                    if(d)
+                    if (d)
                         Object.assign(d, deps);
 
                     resolve(deps);

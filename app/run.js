@@ -11,7 +11,7 @@ class Run {
         this._tasksConfig = config;
 
         this._tasks({
-            type: 'sketch', sync: true, tasks: ['serve', 'sass', 'vendor'], callback: () => {
+            type: 'sketch', sync: true, tasks: ['serve', 'sass'], callback: () => {
 
                 var sketchesPath = path.resolve(process.cwd(), "sketches/");
 
