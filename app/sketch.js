@@ -30,7 +30,7 @@ class Sketch {
             new Create(this.config, args);
         } else {
             console.log("Sketches not initialized!\n");
-            console.log("Please run 'sketches init' first.");
+            console.log("Please run 'sketch-kit init' first.");
         }
     }
 
@@ -65,7 +65,7 @@ class Sketch {
                 });
             } else {
                 console.log("Sketches not initialized!\n");
-                console.log("Please run 'sketch init' first.");
+                console.log("Please run 'sketch-kit init' first.");
                 reject();
             }
         });

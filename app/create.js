@@ -137,7 +137,7 @@ class Create {
     _createSassFile(name) {
         return new Promise((resolve, reject) => {
             var sassPath = path.join(this.config.root, this.config.sass.src);
-            fs.writeFile(sassPath + '/sketches/_' + name + '.scss', this._getSassTemplate(name), {}, err => {
+            fs.outputFile(sassPath + '/sketches/_' + name + '.scss', this._getSassTemplate(name), {}, err => {
                 if (err) reject("Sass Error : " + err.message);
                 resolve();
             });

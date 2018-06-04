@@ -1,6 +1,7 @@
 var fs = require('fs-extra');
 var webpack = require('webpack');
 var path = require('path');
+var copyNodeModules = require('copy-node-modules');
 
 class Update {
 
@@ -10,17 +11,18 @@ class Update {
 
     start() {
         //todo run webpack
-        return new Promise((resolve, reject) => {
-            this._getDependencies().then(deps => {
-                var webpackConfig = this._getWebkitConfig(deps);
-                webpack(webpackConfig, function (error, stats) {
-                    if (error) reject('webpack error :', error);
-                    var statsErrors = stats.toString('errors-only');
-                    if (statsErrors) console.log(statsErrors);
-                    resolve();
-                });
-            });
-        });
+        /* return new Promise((resolve, reject) => {
+             this._getDependencies().then(deps => {
+                 var webpackConfig = this._getWebkitConfig(deps);
+                 webpack(webpackConfig, function (error, stats) {
+                     if (error) reject('webpack error :', error);
+                     var statsErrors = stats.toString('errors-only');
+                     if (statsErrors) console.log(statsErrors);
+                     resolve();
+                 });
+             });
+         });*/
+        return this._copyDependencies();
     }
 
     //------------------------------------------
@@ -34,7 +36,7 @@ class Update {
                 vendor: Object.keys(pkg)
             },
             output: {
-                filename: 'vendor.js',
+                filename: '[name].js',
                 library: '[name]',
                 path: rP
             },
@@ -86,6 +88,27 @@ class Update {
         });
     }
 
+    _copyDependencies() {
+
+        return new Promise(resolve => {
+            var srcDir = "./";
+            var dstDir = "sketches/js";
+
+            fs.remove("sketches/js/node_modules", () => {
+                copyNodeModules(srcDir, dstDir, {devDependencies: false}, function (err, results) {
+                    if (err) {
+                        console.error(err);
+                        return;
+                    }
+                    for (var i in results) {
+                        console.log('package name:' + results[i].name + ' version:' + results[i].version);
+                    }
+
+                    resolve();
+                });
+            });
+        })
+    }
 };
 
 module.exports = Update;
