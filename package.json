@@ -37,8 +37,8 @@
     "gulp-sass-glob": "^1.0.9",
     "gulp-sync": "^0.1.4",
     "inquirer": "^5.2.0",
+    "minimist": "^1.2.0",
     "path": "^0.12.7",
-    "replace": "^1.0.0",
-    "webpack": "^4.8.3"
+    "replace": "^1.0.0"
   }
 }

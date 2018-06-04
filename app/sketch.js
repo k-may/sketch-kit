@@ -25,13 +25,15 @@ class Sketch {
      */
     create(args) {
 
-        if (this._IsInitialized()) {
-            var Create = require("./create");
-            new Create(this.config, args);
-        } else {
-            console.log("Sketches not initialized!\n");
-            console.log("Please run 'sketch-kit init' first.");
-        }
+        this.update().then(() => {
+            if (this._IsInitialized()) {
+                var Create = require("./create");
+                new Create(this.config, args);
+            } else {
+                console.log("Sketches not initialized!\n");
+                console.log("Please run 'sketch-kit init' first.");
+            }
+        });
     }
 
     /**
@@ -51,15 +53,8 @@ class Sketch {
 
         return new Promise((resolve, reject) => {
 
-
             if (this._IsInitialized()) {
-
-
-                console.log("start!");
-
                 var update = new U(this.config);
-
-
                 update.start().then(() => {
                     resolve();
                 });
