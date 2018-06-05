@@ -31,7 +31,7 @@ module.exports = class Main {
                 var sketchConfigPath = './sketches/data/config.json';
                 fs.readFile(sketchConfigPath, 'utf8', (err, config) => {
 
-                    //replace all projectnames throughout template
+                    //replace all sketch names throughout template
                     replace({
                         regex: "sketch-kit",
                         replacement: name,

@@ -17,7 +17,7 @@ class Run {
 
                 var scssPath =  sketchesPath + '/' + this._tasksConfig.sass.src;
                 scssPath = path.join(scssPath, '/**/*.scss');
-                gulp.watch(scssPath, ['sketch:sass']);
+                gulp.watch(scssPath, ['sass']);
 
                 if(args.indexOf('reload') != -1) {
                     gulp.watch(sketchesPath + '/**/*.js').on('change', function() {

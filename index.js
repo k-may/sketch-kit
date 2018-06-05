@@ -2,7 +2,6 @@
 /* eslint-disable no-undef */
 
 var argv = require('minimist')(process.argv.slice(2));
-var fs = require('fs-extra');
 var Sketches = require('./app/sketch');
 var s = new Sketches();
 
