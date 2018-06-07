@@ -72,80 +72,66 @@ class Create {
     _createSketch(name, author) {
 
         var sketchesPath = './sketches/js/views/sketches/' + name;
+        var sassPath = './sketches/scss/sketches';
 
-        this._createTemplate(name)
+        this._createScript(name)
+            .then(this._createSass(name))
             .then(() => {
-                return this._createSassFile(name);
-            }).then(() => {
 
-            //replace all sketchnames throughout template
-            replace({
-                regex: "{sketchname}",
-                replacement: name,
-                paths: [sketchesPath],
-                recursive: true,
-                silent: true,
+                //replace all sketchnames throughout templates
+                replace({
+                    regex: "{sketchname}",
+                    replacement: name,
+                    paths: [sketchesPath, sassPath],
+                    recursive: true,
+                    silent: true,
+                });
+
+                //add new sketch config to sketches/data/config.json
+                this.sketchConfig.sketches[name] = {
+                    "date": new Date(),
+                    "author": author
+                };
+
+                var sketchConfigPath = this.config.root + "/data/config.json";
+                fs.writeFile(sketchConfigPath, JSON.stringify(this.sketchConfig, null, 4));
+
             });
-
-            //add new sketch config to sketches/data/config.json
-            this.sketchConfig.sketches[name] = {
-                "view": name + "/SketchView",
-                "date": new Date(),
-                "author": author
-            };
-
-            var sketchConfigPath = this.config.root + "/data/config.json";
-            fs.writeFile(sketchConfigPath, JSON.stringify(this.sketchConfig, null, 4));
-
-            this._createClassesProxy(name);
-        });
     }
 
-
-    _createClassesProxy() {
+    _createScript(name) {
         return new Promise((resolve, reject) => {
-            var txt = 'window.classes = window.classes || {};\n';
-            for (var id in this.sketchConfig.sketches) {
-                txt += 'import ' + id + '  from "./views/sketches/' + id + '/' + id + '.js";window.classes.' + id + ' = ' + id + ' ;\n'
-            }
-            var jsPath = "./sketches/js/sketches.js";
-            fs.writeFile(jsPath, txt, {}, err => {
-                if (err) reject("Classes proxy error : " + err.message);
+            var templatePath = path.resolve(__dirname, "../");
+            templatePath = path.join(templatePath, "/lib/templates/script.txt");
+            var sketchesPath = './sketches/js/views/sketches/' + name + "/" + name + ".js";
+            //copy and rename
+            fs.copy(templatePath, sketchesPath).then(() => {
                 resolve();
             });
         });
     }
 
-    _createTemplate(name) {
-
+    _createSass(name) {
         return new Promise((resolve, reject) => {
             var templatePath = path.resolve(__dirname, "../");
-            templatePath = path.join(templatePath, "/lib/sketches/js/views/sketches/template");
-            var sketchesPath = './sketches/js/views/sketches/' + name;
-            fs.copy(templatePath, sketchesPath).then(() => {
-                var fileName = sketchesPath + "/SketchView.js";
-                var newName = sketchesPath + "/" + name + ".js";
-                fs.rename(fileName, newName, err => {
-                    if (err) reject();
-
-                    resolve();
-                });
-            });
-        });
-    }
-
-    _createSassFile(name) {
-        return new Promise((resolve, reject) => {
-            var sassPath = path.join(this.config.root, this.config.sass.src);
-            fs.outputFile(sassPath + '/sketches/_' + name + '.scss', this._getSassTemplate(name), {}, err => {
-                if (err) reject("Sass Error : " + err.message);
+            templatePath = path.join(templatePath, "/lib/templates/sass.txt");
+            var sassPath = './sketches/scss/sketches/_' + name + '.scss';
+            //copy and rename
+            fs.copy(templatePath, sassPath).then(() => {
                 resolve();
             });
         });
     }
 
     _getSassTemplate(name) {
-        return "." + name + "{ canvas { display:block; position : fixed; }}"
+        return new Promise(resolve => {
+            var templatePath = path.resolve(__dirname, "../");
+            templatePath = path.join(templatePath, "/lib/templates/script.txt");
+            fs.readFile(templatePath, "utf8", (err, txt) => {
+                if (err) console.error(err.message);
+                resolve(txt);
+            });
+        });
     }
 
     _getPromptConfig() {
@@ -160,9 +146,7 @@ class Create {
             "name": "author",
             "default": os.userInfo().username
         }];
-
     }
 }
-;
 
 module.exports = Create;

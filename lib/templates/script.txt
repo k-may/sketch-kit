@@ -1,0 +1,9 @@
+import {BaseSketch} from "../../BaseSketch.js";
+
+export default class {sketchname} extends BaseSketch {
+
+    constructor() {
+        super('{sketchname}');
+    }
+
+}
