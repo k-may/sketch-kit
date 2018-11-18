@@ -5,9 +5,10 @@ class Sketch {
 
     //TODO add clean task
 
-    constructor() {
+    constructor(options) {
 
         this.config = {
+            "debug" : options.debug !== undefined ? options.debug : false,
             "root": "sketches",
             "sass": {
                 "src": "scss/",
@@ -31,7 +32,7 @@ class Sketch {
                 new Create(this.config, args);
             } else {
                 console.log("Sketches not initialized!\n");
-                console.log("Please run 'sketch-kit init' first.");
+                console.log("Please run 'test init' first.");
             }
         });
     }
@@ -41,7 +42,8 @@ class Sketch {
      */
     init() {
         var Init = require('./init');
-        new Init(this.config);
+        var init = new Init(this.config);
+        return init.run();
     }
 
     /**
@@ -60,7 +62,7 @@ class Sketch {
                 });
             } else {
                 console.log("Sketches not initialized!\n");
-                console.log("Please run 'sketch-kit init' first.");
+                console.log("Please run 'test init' first.");
                 reject();
             }
         });

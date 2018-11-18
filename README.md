@@ -1,4 +1,4 @@
-# sketch-kit
+# test
 Rapid prototyping framework for HTML5 projects
 
 To help speed up the process of creating and running small experiments and prototypes I've developed some tools which I believe take much of the pain out of the experience.
@@ -11,7 +11,7 @@ Features:
 
 ## Usage
 
-I sent up sketch-kit as a global tool via node. You can do this by the following :
+I sent up test as a global tool via node. You can do this by the following :
 
 `npm link`
 
@@ -21,7 +21,7 @@ Once we've global access, we can use the tool in any project folder. Personally,
 
 ### Update
 
-`sketch-kit update`
+`test update`
 
 This is called by default by the following commands. Copies dependencies from package.json into the sketches folder.
 
@@ -33,7 +33,7 @@ import '../../../node_modules/[library path]
 
 ### Init
 
-`sketch-kit init`
+`test init`
 
 This command will add a 'sketches' folder to the root of your directory. Inside you'll find :
 
@@ -57,7 +57,7 @@ sketches/
 
 ### Run
 
-`sketch-kit run`
+`test run`
 
 This will start up browser-sync and the watch tasks for your scss.
 
@@ -65,6 +65,6 @@ Note; I've purposely left minification and bundling out of the framework so that
 
 ### Create
 
-`sketch-kit create [sketch name]`
+`test create [sketch name]`
 
 This will add a new sketch to your sketches and wil now be available in the menu. This sketch includes the base sketch view template and a scss file with the sketch name being used as the css class reference.
