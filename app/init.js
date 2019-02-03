@@ -8,47 +8,59 @@ module.exports = class Main {
     constructor(config) {
 
         this.config = config;
+    }
 
-        //TODO: prompt for project title
-        //TODO: add project title to page title
-
+    run() {
         if (this._IsInitialized()) {
-            console.log('Sketches already initialized');
+            throw new Error('Sketches already initialized');
         } else {
-            this._prompt();
+            return this._initialize();
         }
     }
 
     //----------------------------------------------------
 
-    _prompt() {
-
-        inquirer.prompt(this._getPromptConfig()).then(result => {
-
-            var name = result.sketch;
-            this._copyApp().then(() => {
-
-                var sketchConfigPath = './sketches/data/config.json';
-                fs.readFile(sketchConfigPath, 'utf8', (err, config) => {
-
-                    //replace all sketch names throughout template
-                    replace({
-                        regex: "sketch-kit",
-                        replacement: name,
-                        paths: ["./"],
-                        recursive: true,
-                        silent: true,
-                    });
-
-                    config = JSON.parse(config);
-                    config.project = name;
-                    fs.writeFile(sketchConfigPath, JSON.stringify(config, null, 4));
-
-                });
+    _initialize() {
+        if (this.config.debug) {
+            return this._createApp({
+                "sketch": "test"
             });
-        }).catch(e => {
-            console.log(e);
+        }
+
+        return this._prompt().then(result => {
+            return this._createApp(result);
         });
+
+    }
+
+    _createApp(result) {
+
+        var name = result.sketch;
+        return this._copyApp().then(() => {
+
+            var sketchConfigPath = './sketches/data/config.json';
+            fs.readFile(sketchConfigPath, 'utf8', (err, config) => {
+
+                //replace all sketch names throughout template
+                replace({
+                    regex: "test",
+                    replacement: name,
+                    paths: ["./"],
+                    recursive: true,
+                    silent: true,
+                });
+
+                config = JSON.parse(config);
+                config.project = name;
+
+                return fs.writeFile(sketchConfigPath, JSON.stringify(config, null, 4));
+
+            });
+        });
+    }
+
+    _prompt() {
+        return inquirer.prompt(this._getPromptConfig());
     }
 
     _IsInitialized() {
