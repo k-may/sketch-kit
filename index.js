@@ -3,12 +3,12 @@
 
 var argv = require('minimist')(process.argv.slice(2));
 var Sketches = require('./app/sketch');
-var s = new Sketches();
+var s = new Sketches({
+    debug: false
+});
 
 var action = argv._.shift();
 var args = argv._;
-
-console.log(action);
 
 switch (action) {
     case 'create':
