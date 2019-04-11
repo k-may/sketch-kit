@@ -9,6 +9,8 @@ class Run {
     constructor(config, args) {
 
         this._tasksConfig = config;
+        this.args = args;
+
     }
 
     start(){
@@ -22,7 +24,7 @@ class Run {
                 scssPath = path.join(scssPath, '/**/*.scss');
                 gulp.watch(scssPath, ['sass']);
 
-                if(args.indexOf('reload') != -1) {
+                if(this.args.indexOf('reload') != -1) {
                     gulp.watch(sketchKitPath + '/**/*.js').on('change', function() {
                         browserSync.reload();
                     });
