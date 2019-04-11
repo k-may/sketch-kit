@@ -1,7 +1,7 @@
 var fs = require('fs-extra');
 var U = require('./update');
 
-class Sketch {
+class SketchKit {
 
     //TODO add clean task
 
@@ -9,7 +9,7 @@ class Sketch {
 
         this.config = {
             "debug" : options.debug !== undefined ? options.debug : false,
-            "root": "sketches",
+            "root": "sketch-kit",
             "sass": {
                 "src": "scss/",
                 "dest": "css/",
@@ -26,19 +26,19 @@ class Sketch {
      */
     create(args) {
 
-        this.update().then(() => {
+        return this.update().then(() => {
             if (this._IsInitialized()) {
                 var Create = require("./create");
-                new Create(this.config, args);
+                var create = new Create(this.config, args);
+                return create.start();
             } else {
-                console.log("Sketches not initialized!\n");
-                console.log("Please run 'test init' first.");
+                throw new Error("Sketch-Kit not initialized!\nPlease run 'test init' first.");
             }
         });
     }
 
     /**
-     * Initiates sketches with application folder and build tasks
+     * Initiates Sketch-Kit with application folder and build tasks
      */
     init() {
         var Init = require('./init');
@@ -61,7 +61,7 @@ class Sketch {
                     resolve();
                 });
             } else {
-                console.log("Sketches not initialized!\n");
+                console.log("Sketch-Kit not initialized!\n");
                 console.log("Please run 'test init' first.");
                 reject();
             }
@@ -74,7 +74,8 @@ class Sketch {
     run(args) {
         this.update().then(() => {
             var Run = require('./run');
-            new Run(this.config, args);
+            var run = new Run(this.config, args);
+            return run.start();
         }).catch((e) => {
             console.log("Run error : " + e.message);
         });
@@ -90,7 +91,7 @@ class Sketch {
      */
     _IsInitialized() {
 
-        if (fs.existsSync('./sketches')) {
+        if (fs.existsSync('./sketch-kit')) {
             return true;
         }
 
@@ -98,4 +99,4 @@ class Sketch {
     }
 }
 
-module.exports = Sketch;
+module.exports = SketchKit;

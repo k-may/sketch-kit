@@ -1,24 +1,46 @@
-const Sketches = require('../app/sketch');
+const Sketches = require('../app/sketch-kit');
 const assert = require('chai').assert;
 const fs = require('fs-extra');
 const path = require('path');
 
-sketches = new Sketches({debug: true});
+const sketches = new Sketches({debug: true});
+const sketchesPath = path.resolve(process.cwd(), 'sketch-kit');
 
-describe("Sketches init", function () {
+//========================================================
 
-    it("sketches/ folder created", function () {
-        var sketchesPath = path.resolve(process.cwd(), "sketches");
+describe('SketchKit init', () => {
+    it('sketch-kit/ folder created', async () => {
 
         //remove previous version
-        fs.removeSync(sketchesPath);
+        await fs.removeSync(sketchesPath);
 
-        return sketches.init().then(() => {
-            var folderExist = fs.existsSync(sketchesPath);
+        return sketches.init().then(async () => {
+            var folderExist = await fs.existsSync(sketchesPath);
 
-            assert(folderExist, "folder is not created");
+            assert(folderExist, 'folder is not created');
+        });
+
+    });
+});
+
+//--------------------------------------------------------
+
+describe('SketchKit create', function () {
+
+    it('sketch created', function () {
+
+        return sketches.create(['test']).then(async () => {
+
+            var sketchPath = path.join(sketchesPath, '/js/views/sketches/test');
+            var folderExist = await fs.existsSync(sketchPath);
+
+            assert(folderExist, 'folder is not created');
 
         });
 
     });
+
+
+    //remove previous version
+    fs.removeSync(sketchesPath);
 });

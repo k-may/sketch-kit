@@ -3,6 +3,8 @@ var path = require('path');
 var inquirer = require('inquirer');
 var replace = require("replace");
 
+const FOLDER_NAME = "sketch-kit";
+
 module.exports = class Main {
 
     constructor(config) {
@@ -12,7 +14,7 @@ module.exports = class Main {
 
     run() {
         if (this._IsInitialized()) {
-            throw new Error('Sketches already initialized');
+            throw new Error('Sketch-Kit already initialized');
         } else {
             return this._initialize();
         }
@@ -38,14 +40,14 @@ module.exports = class Main {
         var name = result.sketch;
         return this._copyApp().then(() => {
 
-            var sketchConfigPath = './sketches/data/config.json';
+            var sketchConfigPath = './sketch-kit/data/config.json';
             fs.readFile(sketchConfigPath, 'utf8', (err, config) => {
 
                 //replace all sketch names throughout template
                 replace({
                     regex: "test",
                     replacement: name,
-                    paths: ["./"],
+                    paths: ["./sketch-kit/"],
                     recursive: true,
                     silent: true,
                 });
@@ -65,7 +67,7 @@ module.exports = class Main {
 
     _IsInitialized() {
 
-        if (fs.existsSync('./sketches')) {
+        if (fs.existsSync('./' + FOLDER_NAME)) {
             return true;
         }
 
@@ -73,18 +75,18 @@ module.exports = class Main {
     }
 
     _getPromptConfig() {
-
+        var defaultName = path.basename(path.dirname(process.cwd()));
         return [{
             'type': 'input',
             'message': 'Project name',
             'name': 'sketch',
-            'default': path.dirname(process.cwd()).split('/').pop()
+            'default': defaultName
         }];
 
     }
 
     /***
-     * Updates ingore file with sketches vendor path.
+     * Updates ingore file with Sketch-Kit vendor path.
      * @private
      */
     _updateGitignore() {
@@ -99,16 +101,16 @@ module.exports = class Main {
     }
 
     /***
-     * Copies sketches template application to /sketches folder
+     * Copies Sketch-Kit template application to /Sketch-Kit folder
      *
      * @private
      */
     _copyApp() {
 
         return new Promise(resolve => {
-            var sketchesPath = path.resolve(__dirname, '../');
-            sketchesPath = path.join(sketchesPath + '/lib/sketches');
-            fs.copy(sketchesPath, './sketches', () => {
+            var sketchKitPath = path.resolve(__dirname, '../');
+            sketchKitPath = path.join(sketchKitPath + '/lib/' + FOLDER_NAME);
+            fs.copy(sketchKitPath, './' + FOLDER_NAME, () => {
                 resolve();
             });
 

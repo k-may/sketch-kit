@@ -9,18 +9,21 @@ class Run {
     constructor(config, args) {
 
         this._tasksConfig = config;
+    }
+
+    start(){
 
         this._tasks({
             type: 'sketch', sync: true, tasks: ['serve', 'sass'], callback: () => {
 
-                var sketchesPath = path.resolve(process.cwd(), "sketches/");
+                var sketchKitPath = path.resolve(process.cwd(), "sketch-kit/");
 
-                var scssPath =  sketchesPath + '/' + this._tasksConfig.sass.src;
+                var scssPath =  sketchKitPath + '/' + this._tasksConfig.sass.src;
                 scssPath = path.join(scssPath, '/**/*.scss');
                 gulp.watch(scssPath, ['sass']);
 
                 if(args.indexOf('reload') != -1) {
-                    gulp.watch(sketchesPath + '/**/*.js').on('change', function() {
+                    gulp.watch(sketchKitPath + '/**/*.js').on('change', function() {
                         browserSync.reload();
                     });
                 }
