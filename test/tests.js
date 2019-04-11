@@ -3,8 +3,21 @@ const assert = require('chai').assert;
 const fs = require('fs-extra');
 const path = require('path');
 
-const sketches = new Sketches({debug: true});
 const sketchesPath = path.resolve(process.cwd(), 'sketch-kit');
+
+var sketches;
+
+//========================================================
+
+before(() => {
+    sketches = new Sketches({debug: true});
+});
+
+after(() => {
+    setTimeout(() => {
+        fs.removeSync(sketchesPath);
+    }, 1);
+});
 
 //========================================================
 
