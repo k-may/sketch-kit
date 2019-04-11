@@ -25,9 +25,8 @@
     "url": "https://github.com/k-may/test/issues"
   },
   "homepage": "https://github.com/k-may/test#readme",
-  "devDependencies": {
+  "dependencies": {
     "browser-sync": "^2.24.4",
-    "copy-node-modules": "^1.0.4",
     "fs-extra": "^6.0.1",
     "gulp": "^3.9.1",
     "gulp-autoprefixer": "^5.0.0",
@@ -39,11 +38,7 @@
     "inquirer": "^5.2.0",
     "minimist": "^1.2.0",
     "path": "^0.12.7",
-    "replace": "^1.0.0"
-  },
-  "dependencies": {
-    "chai": "^4.2.0",
-    "fs-extra": "^6.0.1",
-    "mocha": "^5.2.0"
+    "replace": "^1.0.0",
+    "chai": "^4.2.0"
   }
 }
