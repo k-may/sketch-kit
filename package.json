@@ -6,6 +6,7 @@
   "bin": {
     "sketch-kit": "index.js"
   },
+  "preferGlobal": true,
   "scripts": {
     "start": "node index.js",
     "test": "./node_modules/.bin/mocha --reporter spec"
@@ -26,19 +27,19 @@
   },
   "homepage": "https://github.com/k-may/test#readme",
   "dependencies": {
-    "browser-sync": "^2.24.4",
-    "fs-extra": "^6.0.1",
-    "gulp": "^3.9.1",
-    "gulp-autoprefixer": "^5.0.0",
-    "gulp-load-plugins": "^1.5.0",
-    "gulp-plumber": "^1.2.0",
-    "gulp-sass": "^4.0.1",
-    "gulp-sass-glob": "^1.0.9",
-    "gulp-sync": "^0.1.4",
-    "inquirer": "^5.2.0",
-    "minimist": "^1.2.0",
-    "path": "^0.12.7",
-    "replace": "^1.0.0",
-    "chai": "^4.2.0"
+    "browser-sync": "latest",
+    "fs-extra": "latest",
+    "gulp": "latest",
+    "gulp-autoprefixer": "latest",
+    "gulp-load-plugins": "latest",
+    "gulp-plumber": "latest",
+    "gulp-sass": "latest",
+    "gulp-sass-glob": "latest",
+    "gulp-sync": "latest",
+    "inquirer": "latest",
+    "minimist": "latest",
+    "path": "latest",
+    "replace": "latest",
+    "chai": "latest"
   }
 }
