@@ -1,8 +1,8 @@
 var inquirer = require('inquirer');
 var fs = require('fs-extra');
-var os = require("os");
-var path = require("path");
-var replace = require("replace");
+var os = require('os');
+var path = require('path');
+var replace = require('replace');
 
 class Create {
 
@@ -11,13 +11,18 @@ class Create {
         this.config = config;
         this.args = args;
 
-        var sketchConfigPath = this.config.root + "/data/config.json";
+        var sketchConfigPath = this.config.root + '/data/config.json';
         this.sketchConfig = fs.readJSONSync(sketchConfigPath);
+        this.sketchName = args.length ? args[0] : '';
 
-        if (args.length == 1)
-            this._createSketch(args[0], os.userInfo().username);
+
+    }
+
+    start() {
+        if (this.sketchName)
+            return this._createSketch(this.sketchName, os.userInfo().username);
         else
-            this._prompt();
+            return this._prompt();
     }
 
     //----------------------------------------------------
@@ -30,16 +35,16 @@ class Create {
      */
     _prompt() {
 
-        inquirer.prompt(this._getPromptConfig()).then(result => {
+        return inquirer.prompt(this._getPromptConfig()).then(result => {
 
-            var name = result.sketch;
+            var name = this.sketchName;
             var author = result.author;
 
             if (this.sketchConfig.sketches.hasOwnProperty(name)) {
                 inquirer.prompt({
-                    "type": "confirm",
-                    "message": "Sketch already exist, would like to replace it",
-                    "name": "replace"
+                    'type': 'confirm',
+                    'message': 'Sketch already exists, would like to replace it',
+                    'name': 'replace'
                 }).then(result => {
                     if (result.replace) {
                         this._createSketch(name, author);
@@ -48,12 +53,11 @@ class Create {
                     }
 
                 });
-            } else if (name === "") {
-                console.log("Name not valid");
-                this._prompt();
-            }
-            else {
-                this._createSketch(name, author);
+            } else if (name === '') {
+                console.log('Name not valid');
+                return this._prompt();
+            } else {
+                return this._createSketch(name, author);
             }
 
         }).catch(e => {
@@ -62,8 +66,8 @@ class Create {
     }
 
     /***
-     * Copies sketch template to sketches project and updates
-     * sketches configuration.
+     * Copies sketch template to Sketch-Kit project and updates
+     * Sketch-Kit configuration.
      *
      * @param name
      * @param author
@@ -71,41 +75,47 @@ class Create {
      */
     _createSketch(name, author) {
 
-        var sketchesPath = './sketches/js/views/sketches/' + name;
-        var sassPath = './sketches/scss/sketches';
+        //cleanup names
+        name = name.replace('-', '');
 
-        this._createScript(name)
-            .then(this._createSass(name))
-            .then(() => {
+        var sketchKitPath = './sketch-kit/js/views/sketches/' + name;
+        var sassPath = './sketch-kit/scss/sketches';
 
-                //replace all sketchnames throughout templates
-                replace({
-                    regex: "{sketchname}",
-                    replacement: name,
-                    paths: [sketchesPath, sassPath],
-                    recursive: true,
-                    silent: true,
+        return new Promise((resolve, reject) => {
+            return this._createScript(name)
+                .then(this._createSass(name))
+                .then(async () => {
+
+                    //replace all sketchnames throughout templates
+                    replace({
+                        regex: '{sketchname}',
+                        replacement: name,
+                        paths: [sketchKitPath, sassPath],
+                        recursive: true,
+                        silent: true,
+                    });
+
+                    //add new sketch config to sketch-kit/data/config.json
+                    this.sketchConfig.sketches[name] = {
+                        'date': new Date(),
+                        'author': author
+                    };
+
+                    var sketchConfigPath = this.config.root + '/data/config.json';
+                    await fs.writeFileSync(sketchConfigPath, JSON.stringify(this.sketchConfig, null, 4));
+
+                    resolve();
                 });
-
-                //add new sketch config to sketches/data/config.json
-                this.sketchConfig.sketches[name] = {
-                    "date": new Date(),
-                    "author": author
-                };
-
-                var sketchConfigPath = this.config.root + "/data/config.json";
-                fs.writeFile(sketchConfigPath, JSON.stringify(this.sketchConfig, null, 4));
-
-            });
+        });
     }
 
     _createScript(name) {
         return new Promise((resolve, reject) => {
-            var templatePath = path.resolve(__dirname, "../");
-            templatePath = path.join(templatePath, "/lib/templates/script.txt");
-            var sketchesPath = './sketches/js/views/sketches/' + name + "/" + name + ".js";
+            var templatePath = path.resolve(__dirname, '../');
+            templatePath = path.join(templatePath, '/lib/templates/script.txt');
+            var sketchKitPath = './sketch-kit/js/views/sketches/' + name + '/' + name + '.js';
             //copy and rename
-            fs.copy(templatePath, sketchesPath).then(() => {
+            fs.copy(templatePath, sketchKitPath).then(() => {
                 resolve();
             });
         });
@@ -113,9 +123,9 @@ class Create {
 
     _createSass(name) {
         return new Promise((resolve, reject) => {
-            var templatePath = path.resolve(__dirname, "../");
-            templatePath = path.join(templatePath, "/lib/templates/sass.txt");
-            var sassPath = './sketches/scss/sketches/_' + name + '.scss';
+            var templatePath = path.resolve(__dirname, '../');
+            templatePath = path.join(templatePath, '/lib/templates/sass.txt');
+            var sassPath = './sketch-kit/scss/sketches/_' + name + '.scss';
             //copy and rename
             fs.copy(templatePath, sassPath).then(() => {
                 resolve();
@@ -125,9 +135,9 @@ class Create {
 
     _getSassTemplate(name) {
         return new Promise(resolve => {
-            var templatePath = path.resolve(__dirname, "../");
-            templatePath = path.join(templatePath, "/lib/templates/script.txt");
-            fs.readFile(templatePath, "utf8", (err, txt) => {
+            var templatePath = path.resolve(__dirname, '../');
+            templatePath = path.join(templatePath, '/lib/templates/script.txt');
+            fs.readFile(templatePath, 'utf8', (err, txt) => {
                 if (err) console.error(err.message);
                 resolve(txt);
             });
@@ -137,14 +147,14 @@ class Create {
     _getPromptConfig() {
 
         return [{
-            "type": "input",
-            "message": "Sketch name",
-            "name": "sketch"
+            'type': 'input',
+            'message': 'Sketch name',
+            'name': 'sketch'
         }, {
-            "type": "input",
-            "message": "Author",
-            "name": "author",
-            "default": os.userInfo().username
+            'type': 'input',
+            'message': 'Author',
+            'name': 'author',
+            'default': os.userInfo().username
         }];
     }
 }

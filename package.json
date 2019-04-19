@@ -1,11 +1,12 @@
 {
   "name": "sketch-kit",
-  "version": "1.0.6",
+  "version": "1.0.11",
   "description": "Rapid prototyping framework for HTML5/Javascript",
   "main": "index.js",
   "bin": {
     "sketch-kit": "index.js"
   },
+  "preferGlobal": true,
   "scripts": {
     "start": "node index.js",
     "test": "./node_modules/.bin/mocha --reporter spec"

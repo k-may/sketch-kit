@@ -17,9 +17,9 @@ class Update {
 
         return new Promise(resolve => {
             var srcDir = "./";
-            var dstDir = "sketches/js";
+            var dstDir = "sketch-kit/js";
 
-            fs.remove("sketches/js/node_modules", () => {
+            fs.remove("sketch-kit/js/node_modules", () => {
                 copyNodeModules(srcDir, dstDir, {devDependencies: false}, function (err, results) {
                     if (err) {
                         console.error(err);

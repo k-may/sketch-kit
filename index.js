@@ -2,7 +2,7 @@
 /* eslint-disable no-undef */
 
 var argv = require('minimist')(process.argv.slice(2));
-var Sketches = require('./app/sketch');
+var Sketches = require('./app/sketch-kit');
 var s = new Sketches({
     debug: false
 });
