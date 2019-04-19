@@ -75,6 +75,9 @@ class Create {
      */
     _createSketch(name, author) {
 
+        //cleanup names
+        name = name.replace('-', '');
+
         var sketchKitPath = './sketch-kit/js/views/sketches/' + name;
         var sassPath = './sketch-kit/scss/sketches';
 
