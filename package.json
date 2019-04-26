@@ -26,25 +26,21 @@
     "url": "https://github.com/k-may/test/issues"
   },
   "homepage": "https://github.com/k-may/test#readme",
-  "devDependencies": {
-    "fs-extra": "^6.0.1",
-    "inquirer": "^5.2.0",
-    "minimist": "^1.2.0",
-    "path": "^0.12.7",
-    "replace": "^1.0.0"
-  },
   "dependencies": {
     "copy-node-modules": "^1.0.4",
-    "chai": "^4.2.0",
-    "fs-extra": "^6.0.1",
-    "mocha": "^5.2.0",
+    "browser-sync": "latest",
+    "fs-extra": "latest",
     "gulp": "^3.9.1",
-    "gulp-autoprefixer": "^5.0.0",
-    "gulp-load-plugins": "^1.5.0",
-    "gulp-plumber": "^1.2.0",
-    "gulp-sass": "^4.0.1",
-    "gulp-sass-glob": "^1.0.9",
-    "gulp-sync": "^0.1.4",
-    "browser-sync": "^2.24.4"
+    "gulp-autoprefixer": "latest",
+    "gulp-load-plugins": "latest",
+    "gulp-plumber": "latest",
+    "gulp-sass": "latest",
+    "gulp-sass-glob": "latest",
+    "gulp-sync": "latest",
+    "inquirer": "latest",
+    "minimist": "latest",
+    "path": "latest",
+    "replace": "latest",
+    "chai": "latest"
   }
 }
