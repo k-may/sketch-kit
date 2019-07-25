@@ -16,6 +16,17 @@ class Update {
     _copyDependencies() {
 
         return new Promise(resolve => {
+
+            var pkg = fs.readFileSync('./package.json');
+            if(pkg) {
+                pkg = JSON.parse(pkg);
+                console.log(pkg);
+
+                if(!pkg.dependencies)
+                    resolve();
+                    return;
+            }
+
             var srcDir = "./";
             var dstDir = "sketch-kit/js";
 
