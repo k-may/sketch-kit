@@ -20,17 +20,18 @@ class Update {
             var pkg = fs.readFileSync('./package.json');
             if(pkg) {
                 pkg = JSON.parse(pkg);
-                console.log(pkg);
 
-                if(!pkg.dependencies)
+                if(!pkg.dependencies) {
                     resolve();
                     return;
+                }
             }
 
             var srcDir = "./";
             var dstDir = "sketch-kit/js";
 
             fs.remove("sketch-kit/js/node_modules", () => {
+
                 copyNodeModules(srcDir, dstDir, {devDependencies: false}, function (err, results) {
                     if (err) {
                         console.error(err);

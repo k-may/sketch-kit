@@ -17,7 +17,8 @@ module.exports = function(gulp, plugins, config) {
 
         browserSync.init(files, {
             server: pathSketches,
-            port: _port
+            port: _port/*,
+            https: true*/
         });
     };
 };
