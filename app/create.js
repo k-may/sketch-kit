@@ -80,7 +80,9 @@ class Create {
     _copySketch(name, author) {
 
         var origSketchPath = path.join(process.cwd(), 'sketch-kit/js/views/sketches/', name);
-        var newName = this._getSketchNameVersioned(name);//this._getSketchVersion(name);
+
+        var newName = this.args.length > 1 ? this.args[1] : name
+        newName = this._getSketchNameVersioned(newName);
         var newSketchPath = './sketch-kit/js/views/sketches/' + newName;
 
         return new Promise((resolve, reject) => {
@@ -264,32 +266,11 @@ class Create {
                 }
             }
         }
+        if(children.length)
+            return parent + '_' + (children.length + 1);
 
-        return parent + '_' + (children.length + 1);
-
+        return parent;
     }
-
-    /*_getSketchVersion(name) {
-
-        var srcPath = path.join(process.cwd(), 'sketch-kit/js/views/sketches/');
-        const getDirectories = srcPath => fs.readdirSync(srcPath).filter(file => fs.statSync(path.join(srcPath, file)).isDirectory());
-        var result = getDirectories(srcPath);
-        var versions = []
-        var version = this._versionRoot(name);
-        result.forEach(dir => {
-
-            //check root
-            if (dir.indexOf(name) == 0) {
-
-                //check version root
-                var parentVersion = this._versionRoot(dir);
-                if (parentVersion == version) {
-                    versions.push(dir);
-                }
-            }
-        });
-        return name + '_' + (versions.length);
-    }*/
 
     _getPromptConfig() {
 

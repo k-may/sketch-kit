@@ -65,6 +65,8 @@ Note; I've purposely left minification and bundling out of the framework so that
 
 ### Create
 
-`test create [sketch name]`
+`test create [sketch name] [copy name(optional)]`
 
 This will add a new sketch to your sketches and wil now be available in the menu. This sketch includes the base sketch view template and a scss file with the sketch name being used as the css class reference.
+
+If the sketch already exists, you'll be prompted to copy or replace, creating a new nested iteration.
