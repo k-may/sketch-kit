@@ -266,10 +266,9 @@ class Create {
                 }
             }
         }
-        if(children.length)
-            return parent + '_' + (children.length + 1);
 
-        return parent;
+        return parent + '_' + (children.length + 1);
+
     }
 
     _getPromptConfig() {
