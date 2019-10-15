@@ -34,6 +34,8 @@ class SketchKit {
             } else {
                 throw new Error("Sketch-Kit not initialized!\nPlease run 'test init' first.");
             }
+        }).catch(e =>{
+            console.log(e);
         });
     }
 
