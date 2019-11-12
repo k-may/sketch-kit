@@ -27,20 +27,20 @@
   },
   "homepage": "https://github.com/k-may/test#readme",
   "dependencies": {
-    "copy-node-modules": "^1.0.4",
     "browser-sync": "latest",
+    "chai": "latest",
+    "copy-node-modules": "^1.0.4",
     "fs-extra": "latest",
-    "gulp": "^3.9.1",
+    "gulp": "^4.0.2",
     "gulp-autoprefixer": "latest",
     "gulp-load-plugins": "latest",
     "gulp-plumber": "latest",
     "gulp-sass": "latest",
     "gulp-sass-glob": "latest",
-    "gulp-sync": "latest",
     "inquirer": "latest",
     "minimist": "latest",
     "path": "latest",
     "replace": "latest",
-    "chai": "latest"
+    "v4": "0.0.1"
   }
 }

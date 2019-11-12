@@ -1,6 +1,7 @@
 /* eslint-disable no-undef */
 var path = require('path');
 var sassGlob = require('gulp-sass-glob');
+var plugins = require('gulp-load-plugins')();
 
 module.exports = function(gulp, plugins, config) {
     return function() {
