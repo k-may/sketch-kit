@@ -8,6 +8,7 @@ const sketchesPath = path.resolve(process.cwd(), 'sketch-kit');
 var sketches;
 
 //========================================================
+process.env.TEST = true;
 
 before(() => {
     sketches = new Sketches({debug: true});
@@ -15,8 +16,10 @@ before(() => {
 
 after(() => {
     setTimeout(() => {
-        fs.removeSync(sketchesPath);
-    }, 1);
+        fs.removeSync(sketchesPath, {}, err=>{
+            console.log(err);
+        })
+    }, 100);
 });
 
 //========================================================
@@ -25,7 +28,7 @@ describe('SketchKit init', () => {
     it('sketch-kit/ folder created', async () => {
 
         //remove previous version
-        await fs.removeSync(sketchesPath);
+        //await fs.removeSync(sketchesPath);
 
         return sketches.init().then(async () => {
             var folderExist = await fs.existsSync(sketchesPath);
@@ -55,5 +58,5 @@ describe('SketchKit create', function () {
 
 
     //remove previous version
-    fs.removeSync(sketchesPath);
+    //fs.removeSync(sketchesPath);
 });

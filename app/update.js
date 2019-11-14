@@ -17,34 +17,39 @@ class Update {
 
         return new Promise(resolve => {
 
-            var pkg = fs.readFileSync('./package.json');
-            if(pkg) {
-                pkg = JSON.parse(pkg);
+            if(process.env.TEST) {
+                resolve();
+            }else {
 
-                if(!pkg.dependencies) {
-                    resolve();
-                    return;
-                }
-            }
+                var pkg = fs.readFileSync('./package.json');
+                if (pkg) {
+                    pkg = JSON.parse(pkg);
 
-            var srcDir = "./";
-            var dstDir = "sketch-kit/js";
-
-            fs.remove("sketch-kit/js/node_modules", () => {
-
-                copyNodeModules(srcDir, dstDir, {devDependencies: false}, function (err, results) {
-                    if (err) {
-                        console.error(err);
+                    if (!pkg.dependencies) {
+                        resolve();
                         return;
                     }
-                    for (var i in results) {
-                        console.log('package name:' + results[i].name + ' version:' + results[i].version);
-                    }
+                }
 
-                    resolve();
+                var srcDir = "./";
+                var dstDir = "sketch-kit/js";
+
+                fs.remove("sketch-kit/js/node_modules", () => {
+
+                    copyNodeModules(srcDir, dstDir, {devDependencies: false}, function (err, results) {
+                        if (err) {
+                            console.error(err);
+                            return;
+                        }
+                        for (var i in results) {
+                            console.log('package name:' + results[i].name + ' version:' + results[i].version);
+                        }
+
+                        resolve();
+                    });
                 });
-            });
-        })
+            }
+        });
     }
 }
 

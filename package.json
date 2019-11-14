@@ -27,7 +27,6 @@
   },
   "homepage": "https://github.com/k-may/test#readme",
   "dependencies": {
-    "browser-sync": "latest",
     "chai": "latest",
     "copy-node-modules": "^1.0.4",
     "fs-extra": "latest",
