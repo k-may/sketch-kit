@@ -1,4 +1,4 @@
-# test
+# sketch-kit
 Rapid prototyping framework for HTML5 projects
 
 To help speed up the process of creating and running small experiments and prototypes I've developed some tools which I believe take much of the pain out of the experience.
@@ -9,19 +9,16 @@ Features:
 - entirely es6
 - no bundling (for better debugging and edit-and-continue)
 
-## Usage
+## Setup
 
-I sent up test as a global tool via node. You can do this by the following :
+Each 'sketch' gets a javascript file and scss file generated on creation.
 
-`npm link`
+When the sketch is selected from the menu (top left, very discrete) the js for the sketch is imported and attached to a dom element on the page. This element is exposed as this.el.
 
-See the documentation here for explanation : https://blog.npmjs.org/post/118810260230/building-a-simple-command-line-tool-with-npm
-
-Once we've global access, we can use the tool in any project folder. Personally, I like to include a 'sketches' folder in every project as I like to keep track of the prototypes which exist in parallel with a project.
-
+## Commands
 ### Update
 
-`test update`
+`sketch-kit update`
 
 This is called by default by the following commands. Copies dependencies from package.json into the sketches folder.
 
@@ -33,7 +30,7 @@ import '../../../node_modules/[library path]
 
 ### Init
 
-`test init`
+`sketch-kit init`
 
 This command will add a 'sketches' folder to the root of your directory. Inside you'll find :
 
@@ -57,7 +54,7 @@ sketches/
 
 ### Run
 
-`test run`
+`sketch-kit run`
 
 This will start up browser-sync and the watch tasks for your scss.
 
@@ -65,7 +62,7 @@ Note; I've purposely left minification and bundling out of the framework so that
 
 ### Create
 
-`test create [sketch name] [copy name(optional)]`
+`sketch-kit create [sketch name] [copy name(optional)]`
 
 This will add a new sketch to your sketches and wil now be available in the menu. This sketch includes the base sketch view template and a scss file with the sketch name being used as the css class reference.
 
