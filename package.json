@@ -42,5 +42,8 @@
     "path": "latest",
     "replace": "latest",
     "v4": "0.0.1"
+  },
+  "devDependencies": {
+    "os": "^0.1.1"
   }
 }

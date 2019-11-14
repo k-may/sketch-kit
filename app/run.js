@@ -1,6 +1,7 @@
 var gulp = require('gulp');
 var path = require('path');
 var plugins = require('gulp-load-plugins')();
+var fs = require('fs');
 
 class Run {
 
@@ -18,17 +19,15 @@ class Run {
         var scripts =  require(taskPath)(gulp, plugins, this._tasksConfig);
         var sketchKitPath = path.resolve(process.cwd(), "sketch-kit/");
         var scssPath =  sketchKitPath + '/' + this._tasksConfig.sass.src;
-        scssPath = path.join(scssPath, '/**/*.scss');
-        gulp.watch(scssPath, scripts);
+        fs.watch(scssPath, {recursive : true}, scripts);
         scripts();
 
         //sass
-        var taskPath = path.resolve(__dirname, '../tools/build/serve');
-        var scripts =  require(taskPath)(gulp, plugins, this._tasksConfig);
-        scripts();
+         var taskPath = path.resolve(__dirname, '../tools/build/serve');
+         var scripts =  require(taskPath)(gulp, plugins, this._tasksConfig);
+         scripts();
 
     }
-
 
 }
 
