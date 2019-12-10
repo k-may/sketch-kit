@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 var browserSync = require('browser-sync');
 
-module.exports = function(gulp, plugins, config) {
+module.exports = function(config) {
     return function() {
 
         var pathSketches = process.cwd() + '/' + config.root;

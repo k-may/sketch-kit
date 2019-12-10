@@ -24,8 +24,8 @@ class Run {
 
         //sass
          var taskPath = path.resolve(__dirname, '../tools/build/serve');
-         var scripts =  require(taskPath)(gulp, plugins, this._tasksConfig);
-         scripts();
+         var serve =  require(taskPath)(this._tasksConfig);
+         serve();
 
     }
 
