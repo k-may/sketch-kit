@@ -16,7 +16,7 @@ class Run {
 
         //browser-sync
         var taskPath = path.resolve(__dirname, '../tools/build/sass');
-        var scripts =  require(taskPath)(gulp, plugins, this._tasksConfig);
+        const scripts =  require(taskPath)(gulp, plugins, this._tasksConfig);
         var sketchKitPath = path.resolve(process.cwd(), "sketch-kit/");
         var scssPath =  sketchKitPath + '/' + this._tasksConfig.sass.src;
         fs.watch(scssPath, {recursive : true}, scripts);
@@ -24,7 +24,7 @@ class Run {
 
         //sass
          var taskPath = path.resolve(__dirname, '../tools/build/serve');
-         var serve =  require(taskPath)(this._tasksConfig);
+        const serve =  require(taskPath)(this._tasksConfig);
          serve();
 
     }

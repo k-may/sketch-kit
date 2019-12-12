@@ -17,7 +17,8 @@ module.exports = function(config) {
 
         browserSync.init(files, {
             server: pathSketches,
-            port: _port/*,
+            port: _port,
+            ghostMode: false/*,
             https: true*/
         });
     };
