@@ -16,19 +16,33 @@ class Run {
 
         //browser-sync
         var taskPath = path.resolve(__dirname, '../tools/build/sass');
-        const scripts =  require(taskPath)(gulp, plugins, this._tasksConfig);
-        var sketchKitPath = path.resolve(process.cwd(), "sketch-kit/");
-        var scssPath =  sketchKitPath + '/' + this._tasksConfig.sass.src;
-        fs.watch(scssPath, {recursive : true}, scripts);
+        const scripts = require(taskPath)(gulp, plugins, this._tasksConfig);
+        var sketchKitPath = path.resolve(process.cwd(), 'sketch-kit/');
+        var scssPath = sketchKitPath + '/' + this._tasksConfig.sass.src;
+
+        this.watch(scssPath, scripts);
         scripts();
 
         //sass
-         var taskPath = path.resolve(__dirname, '../tools/build/serve');
-        const serve =  require(taskPath)(this._tasksConfig);
-         serve();
+        taskPath = path.resolve(__dirname, '../tools/build/serve');
+
+        const serve = require(taskPath)(this._tasksConfig);
+        serve();
 
     }
 
+    watch(path, cb){
+        var tmeOut;
+        fs.watch(path, {recursive: true}, () => {
+            if (!tmeOut) {
+                tmeOut = setTimeout(() => {
+                    cb();
+                    tmeOut = null;
+                });
+            }
+        });
+
+    }
 }
 
 module.exports = Run;

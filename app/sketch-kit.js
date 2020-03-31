@@ -79,7 +79,7 @@ class SketchKit {
             var run = new Run(this.config, args);
             return run.start();
         }).catch((e) => {
-            console.log("Run error : " + e.message);
+            console.log("Run error : " + e);
         });
     }
 

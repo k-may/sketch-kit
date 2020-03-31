@@ -10,8 +10,6 @@ module.exports = function(gulp, plugins, config) {
         var dest = path.resolve(src, config.sass.dest);
         src = path.join(src, config.sass.src, config.sass.entry);
 
-        console.log("sass");
-
         gulp.src(src)
             .pipe(sassGlob())
             .pipe(plugins.plumber())
