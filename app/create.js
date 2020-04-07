@@ -10,19 +10,18 @@ class Create {
 
         this.config = config;
         this.args = args;
-
-        var sketchConfigPath = this.config.root + '/data/config.json';
-        this.sketchConfig = fs.readJSONSync(sketchConfigPath);
         this.sketchName = args.length ? args[0] : '';
 
     }
 
     start() {
-        if (this.sketchName) {
-            //return this._createSketch(this.sketchName, os.userInfo().username);
-            return this._tryCreateSketch(this.sketchName, os.userInfo().username);
-        } else
-            return this._prompt();
+        this._getConfig().then(config => {
+            if (this.sketchName) {
+                //return this._createSketch(this.sketchName, os.userInfo().username);
+                return this._tryCreateSketch(this.sketchName, os.userInfo().username);
+            } else
+                return this._prompt();
+        });
     }
 
     //----------------------------------------------------
@@ -160,7 +159,7 @@ class Create {
 
         this._seeConfigRelations();
 
-        var sketchConfigPath = this.config.root + '/data/config.json';
+        var sketchConfigPath = this._getConfigPath();
         await fs.writeFileSync(sketchConfigPath, JSON.stringify(this.sketchConfig, null, 4));
 
     }
@@ -283,6 +282,31 @@ class Create {
             'name': 'author',
             'default': os.userInfo().username
         }];
+    }
+
+    _getConfig() {
+        return new Promise((resolve, reject) => {
+
+            var sketchConfigPath = this._getConfigPath();
+
+            try {
+                this.sketchConfig = fs.readJSONSync(sketchConfigPath);
+            } catch (e) {
+                this.config.legacy = true;
+                sketchConfigPath = this._getConfigPath();
+                this.sketchConfig = fs.readJSONSync(sketchConfigPath);
+            }
+
+            resolve(this.sketchConfig);
+
+        });
+    }
+
+    _getConfigPath() {
+        if (this.config.legacy)
+            return this.config.root + '/data/config.json';
+
+        return this.config.root + '/config.json';
     }
 }
 
