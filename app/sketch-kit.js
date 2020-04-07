@@ -8,14 +8,16 @@ class SketchKit {
     constructor(options) {
 
         this.config = {
-            "debug" : options.debug !== undefined ? options.debug : false,
-            "root": "sketch-kit",
-            "sass": {
-                "src": "scss/",
-                "dest": "css/",
-                "entry": "main.scss"
-            }
+            'debug': options.debug !== undefined ? options.debug : false,
+            'root': 'sketch-kit',
+            'sass': {
+                'src': 'scss/',
+                'dest': 'css/',
+                'entry': 'main.scss'
+            },
+            'include_modules': true
         };
+
 
     }
 
@@ -28,13 +30,13 @@ class SketchKit {
 
         return this.update().then(() => {
             if (this._IsInitialized()) {
-                var Create = require("./create");
+                var Create = require('./create');
                 var create = new Create(this.config, args);
                 return create.start();
             } else {
-                throw new Error("Sketch-Kit not initialized!\nPlease run 'test init' first.");
+                throw new Error('Sketch-Kit not initialized!\nPlease run \'test init\' first.');
             }
-        }).catch(e =>{
+        }).catch(e => {
             console.log(e);
         });
     }
@@ -58,13 +60,15 @@ class SketchKit {
         return new Promise((resolve, reject) => {
 
             if (this._IsInitialized()) {
-                var update = new U(this.config);
-                update.start().then(() => {
-                    resolve();
+                this._getConfig().then(config => {
+                    var update = new U(config);
+                    update.start().then(() => {
+                        resolve();
+                    });
                 });
             } else {
-                console.log("Sketch-Kit not initialized!\n");
-                console.log("Please run 'test init' first.");
+                console.log('Sketch-Kit not initialized!\n');
+                console.log('Please run \'test init\' first.');
                 reject();
             }
         });
@@ -79,7 +83,7 @@ class SketchKit {
             var run = new Run(this.config, args);
             return run.start();
         }).catch((e) => {
-            console.log("Run error : " + e);
+            console.log('Run error : ' + e);
         });
     }
 
@@ -98,6 +102,27 @@ class SketchKit {
         }
 
         return false;
+    }
+
+    _getConfig() {
+        return new Promise((resolve, reject) => {
+            if (this._IsInitialized()) {
+                fs.readFile('./sketch-kit/config.json', 'utf-8', (err, data) => {
+
+                    if (err)
+                        resolve(this.config)
+                    else {
+                        //merge global and local configs
+                        this.config = {
+                            ...this.config,
+                            ...JSON.parse(data)
+                        };
+                        resolve(this.config);
+                    }
+                });
+            } else
+                reject();
+        });
     }
 }
 

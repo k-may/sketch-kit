@@ -17,7 +17,7 @@ class Update {
 
         return new Promise(resolve => {
 
-            if(process.env.TEST) {
+            if(!this.config.include_modules || process.env.TEST) {
                 resolve();
             }else {
 
