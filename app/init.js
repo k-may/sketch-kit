@@ -2,6 +2,7 @@ var fs = require('fs-extra');
 var path = require('path');
 var inquirer = require('inquirer');
 var replace = require("replace");
+var utils = require('./utils.js');
 
 const FOLDER_NAME = "sketch-kit";
 
@@ -40,9 +41,7 @@ module.exports = class Main {
         var name = result.sketch;
         return this._copyApp().then(() => {
 
-            var sketchConfigPath = './sketch-kit/data/config.json';
-            fs.readFile(sketchConfigPath, 'utf8', (err, config) => {
-
+            utils.loadConfig().then( ({ config, path }) =>{
                 //replace all sketch names throughout template
                 replace({
                     regex: "test",
@@ -52,10 +51,9 @@ module.exports = class Main {
                     silent: true,
                 });
 
-                config = JSON.parse(config);
                 config.project = name;
 
-                return fs.writeFile(sketchConfigPath, JSON.stringify(config, null, 4));
+                return fs.writeFile(path, JSON.stringify(config, null, 4));
 
             });
         });
