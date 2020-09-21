@@ -9,7 +9,6 @@ const FOLDER_NAME = "sketch-kit";
 module.exports = class Main {
 
     constructor(config) {
-
         this.config = config;
     }
 
@@ -36,22 +35,28 @@ module.exports = class Main {
 
     }
 
+    /**
+     *
+     * @param result : inquirer.ui.Prompt
+     * @returns {Promise<null>}
+     * @private
+     */
     _createApp(result) {
 
-        var name = result.sketch;
+        var projectName = result.sketch;
         return this._copyApp().then(() => {
 
             utils.loadConfig().then( ({ config, path }) =>{
                 //replace all sketch names throughout template
                 replace({
-                    regex: "test",
-                    replacement: name,
+                    regex: "{project-name}",
+                    replacement: projectName,
                     paths: ["./sketch-kit/"],
                     recursive: true,
                     silent: true,
                 });
 
-                config.project = name;
+                config.project = projectName;
 
                 return fs.writeFile(path, JSON.stringify(config, null, 4));
 
@@ -63,6 +68,11 @@ module.exports = class Main {
         return inquirer.prompt(this._getPromptConfig());
     }
 
+    /**
+     * Check if project folder already exists
+     * @returns {boolean}
+     * @private
+     */
     _IsInitialized() {
 
         if (fs.existsSync('./' + FOLDER_NAME)) {

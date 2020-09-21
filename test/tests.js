@@ -24,7 +24,7 @@ after(() => {
 
 //========================================================
 
-describe('SketchKit init', () => {
+describe('SketchKit A : init', () => {
     it('sketch-kit/ folder created', async () => {
 
         //remove previous version
@@ -37,11 +37,6 @@ describe('SketchKit init', () => {
         });
 
     });
-});
-
-//--------------------------------------------------------
-
-describe('SketchKit create', function () {
 
     it('sketch created', function () {
 
@@ -55,8 +50,15 @@ describe('SketchKit create', function () {
         });
 
     });
+});
+
+//--------------------------------------------------------
+/*
+
+describe('SketchKit B : create', function () {
+
 
 
     //remove previous version
     //fs.removeSync(sketchesPath);
-});
+});*/
