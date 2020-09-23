@@ -1,4 +1,4 @@
-# sketch-kit
+![alt text](sketch-kit.png "Logo Title Text 1")
 
 [![npm version](https://badge.fury.io/js/sketch-kit.svg)](https://badge.fury.io/js/sketch-kit)
 
@@ -49,10 +49,11 @@ sketches/
 --------/--------/views
 --------/--------/--------/components
 --------/--------/--------/sketches
---------/node_modules
+--------/node_modules (optional)
 --------/scss
 --------/--------/sketches
 --------/index.html
+--------/config.json
 ```
 
 **Options**
