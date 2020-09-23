@@ -1,4 +1,6 @@
 # sketch-kit
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fk-may%2Fsketch-kit.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fk-may%2Fsketch-kit?ref=badge_shield)
+
 Rapid prototyping framework for HTML5 projects
 
 To help speed up the process of creating and running small experiments and prototypes I've developed some tools which I believe take much of the pain out of the experience.
@@ -67,3 +69,6 @@ Note; I've purposely left minification and bundling out of the framework so that
 This will add a new sketch to your sketches and wil now be available in the menu. This sketch includes the base sketch view template and a scss file with the sketch name being used as the css class reference.
 
 If the sketch already exists, you'll be prompted to copy or replace, creating a new nested iteration.
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fk-may%2Fsketch-kit.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fk-may%2Fsketch-kit?ref=badge_large)
