@@ -1,6 +1,6 @@
 {
   "name": "sketch-kit",
-  "version": "1.0.28",
+  "version": "1.1.0",
   "description": "Rapid prototyping framework for HTML5/Javascript",
   "main": "index.js",
   "bin": {
