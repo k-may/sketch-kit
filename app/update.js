@@ -17,9 +17,9 @@ class Update {
 
         return new Promise(resolve => {
 
-            if(!this.config.include_modules || process.env.TEST) {
+            if (!this.config.copyDependencies || process.env.TEST) {
                 resolve();
-            }else {
+            } else {
 
                 var pkg = fs.readFileSync('./package.json');
                 if (pkg) {
@@ -31,10 +31,10 @@ class Update {
                     }
                 }
 
-                var srcDir = "./";
-                var dstDir = "sketch-kit/js";
+                var srcDir = './';
+                var dstDir = 'sketch-kit/js';
 
-                fs.remove("sketch-kit/js/node_modules", () => {
+                fs.remove('sketch-kit/js/node_modules', () => {
 
                     copyNodeModules(srcDir, dstDir, {devDependencies: false}, function (err, results) {
                         if (err) {

@@ -1,11 +1,14 @@
 # sketch-kit
+
+[![npm version](https://badge.fury.io/js/sketch-kit.svg)](https://badge.fury.io/js/sketch-kit)
+
 Rapid prototyping framework for HTML5 projects
 
 To help speed up the process of creating and running small experiments and prototypes I've developed some tools which I believe take much of the pain out of the experience.
 
-The idea being that the more time I can spend on the fun bits (vs the boring dev-ops bits) the better.
+The idea being that the more time I can spend on the fun bits (vs the boring dev-ops bits) the better and more expressive prototyping can be.
 
-Features:
+**Features**:
 - entirely es6
 - no bundling (for better debugging and edit-and-continue)
 
@@ -52,18 +55,23 @@ sketches/
 --------/index.html
 ```
 
+**Options**
+
+- Project Name. _Name for the project (basically becomes the title for the rendered page)._
+- Copy Node Dependencies. _sketch-kit will automatically copy all dependencies from your project.json, making them available to your sketches (note: js modules only)._
+
 ### Run
 
 `sketch-kit run`
 
-This will start up browser-sync and the watch tasks for your scss.
+sketch-kit will start up browser-sync and the watch tasks for your scss.
 
-Note; I've purposely left minification and bundling out of the framework so that its possible to edit your sources using developer tools. We've bundling for the vendor files only
+Note; I've purposely left minification and bundling out of the framework so that its possible to use js modules only. We've bundling for the vendor files only
 
 ### Create
 
 `sketch-kit create [sketch name] [copy name(optional)]`
 
-This will add a new sketch to your sketches and wil now be available in the menu. This sketch includes the base sketch view template and a scss file with the sketch name being used as the css class reference.
+sketch-kit will add a new sketch to your sketches and wil now be available in the menu. This sketch includes the base sketch view template and a scss file with the sketch name being used as the css class reference.
 
 If the sketch already exists, you'll be prompted to copy or replace, creating a new nested iteration.

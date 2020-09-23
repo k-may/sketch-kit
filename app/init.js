@@ -57,6 +57,7 @@ module.exports = class Main {
                 });
 
                 config.project = projectName;
+                config.copyDependencies = result.copyDependencies === "yes";
 
                 return fs.writeFile(path, JSON.stringify(config, null, 4));
 
@@ -89,6 +90,15 @@ module.exports = class Main {
             'message': 'Project name',
             'name': 'sketch',
             'default': defaultName
+        }, {
+            'type' : 'input',
+            'message' : 'Copy Node Dependencies',
+            'name' : 'copyDependencies',
+            'choices' : ['yes', 'no'],
+            'default' : 'yes',
+            validate : answer =>{
+                return answer === 'yes' || answer === 'no'
+            }
         }];
 
     }
