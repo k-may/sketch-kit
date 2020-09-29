@@ -20,12 +20,12 @@
     "HTML5",
     "kit"
   ],
-  "author": "k-may",
+  "author": "k-may (https://github.com/k-may)",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/k-may/test/issues"
   },
-  "homepage": "https://github.com/k-may/test#readme",
+  "homepage": "https://github.com/k-may/sketch-kit",
   "dependencies": {
     "chai": "latest",
     "copy-node-modules": "^1.0.4",
