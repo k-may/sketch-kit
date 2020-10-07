@@ -9,7 +9,7 @@
   "preferGlobal": true,
   "scripts": {
     "start": "node index.js",
-    "test": "./node_modules/.bin/mocha --reporter spec"
+    "test": "mocha 'test/**/*.js' --recursive --timeout 60000"
   },
   "repository": {
     "type": "git",

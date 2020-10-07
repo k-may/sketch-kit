@@ -1,10 +1,10 @@
 var fs = require('fs-extra');
 var path = require('path');
 var inquirer = require('inquirer');
-var replace = require("replace");
+var replace = require('replace');
 var utils = require('./utils.js');
 
-const FOLDER_NAME = "sketch-kit";
+const FOLDER_NAME = 'sketch-kit';
 
 module.exports = class Main {
 
@@ -22,16 +22,15 @@ module.exports = class Main {
 
     //----------------------------------------------------
 
-    _initialize() {
+    async _initialize() {
         if (this.config.debug) {
             return this._createApp({
-                "sketch": "test"
+                'sketch': 'test'
             });
         }
 
-        return this._prompt().then(result => {
-            return this._createApp(result);
-        });
+        var result = await this._prompt()
+        return this._createApp(result);
 
     }
 
@@ -41,28 +40,11 @@ module.exports = class Main {
      * @returns {Promise<null>}
      * @private
      */
-    _createApp(result) {
+    async _createApp(result) {
 
-        var projectName = result.sketch;
-        return this._copyApp().then(() => {
+        await this._copyApp();
+        await this._copyConfig(result);
 
-            utils.loadConfig().then( ({ config, path }) =>{
-                //replace all sketch names throughout template
-                replace({
-                    regex: "{project-name}",
-                    replacement: projectName,
-                    paths: ["./sketch-kit/"],
-                    recursive: true,
-                    silent: true,
-                });
-
-                config.project = projectName;
-                config.copyDependencies = result.copyDependencies === "yes";
-
-                return fs.writeFile(path, JSON.stringify(config, null, 4));
-
-            });
-        });
     }
 
     _prompt() {
@@ -91,12 +73,12 @@ module.exports = class Main {
             'name': 'sketch',
             'default': defaultName
         }, {
-            'type' : 'input',
-            'message' : 'Copy Node Dependencies',
-            'name' : 'copyDependencies',
-            'choices' : ['yes', 'no'],
-            'default' : 'yes',
-            validate : answer =>{
+            'type': 'input',
+            'message': 'Copy Node Dependencies',
+            'name': 'copyDependencies',
+            'choices': ['yes', 'no'],
+            'default': 'yes',
+            validate: answer => {
                 return answer === 'yes' || answer === 'no'
             }
         }];
@@ -133,6 +115,25 @@ module.exports = class Main {
             });
 
         });
+
+    }
+
+    async _copyConfig({sketch, copyDependencies}) {
+
+        const {config, path} = await utils.loadConfig();//.then(({config, path}) => {
+        //replace all sketch names throughout template
+        replace({
+            regex: '{project-name}',
+            replacement: sketch,
+            paths: ['./sketch-kit/'],
+            recursive: true,
+            silent: true,
+        });
+
+        config.project = sketch;
+        config.copyDependencies = copyDependencies === 'yes';
+
+        await fs.writeFile(path, JSON.stringify(config, null, 4));
 
     }
 

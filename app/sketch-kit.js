@@ -26,9 +26,10 @@ class SketchKit {
     /**
      * Prompts for info and appends new sketch to sketches
      */
-    create(args) {
+    async create(args) {
 
-        return this.update().then(() => {
+        try {
+            await this.update()
             if (this._IsInitialized()) {
                 var Create = require('./create');
                 var create = new Create(this.config, args);
@@ -36,9 +37,9 @@ class SketchKit {
             } else {
                 throw new Error('Sketch-Kit not initialized!\nPlease run \'test init\' first.');
             }
-        }).catch(e => {
+        } catch (e) {
             console.log(e);
-        });
+        }
     }
 
     /**

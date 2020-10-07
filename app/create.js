@@ -14,14 +14,13 @@ class Create {
 
     }
 
-    start() {
-        this._getConfig().then(config => {
-            if (this.sketchName) {
-                //return this._createSketch(this.sketchName, os.userInfo().username);
-                return this._tryCreateSketch(this.sketchName, os.userInfo().username);
-            } else
-                return this._prompt();
-        });
+    async start() {
+        var config = await this._getConfig();
+        if (this.sketchName) {
+            //return this._createSketch(this.sketchName, os.userInfo().username);
+            await this._tryCreateSketch(this.sketchName, os.userInfo().username);
+        } else
+            await this._prompt();
     }
 
     //----------------------------------------------------
@@ -41,7 +40,7 @@ class Create {
         });
     }
 
-    _tryCreateSketch(name, author) {
+    async _tryCreateSketch(name, author) {
 
         this.sketchName = name;
         this.author = author;
@@ -52,7 +51,7 @@ class Create {
             console.log('Name not valid');
             return this._prompt();
         } else {
-            return this._createSketch(name, author);
+            await this._createSketch(name, author);
         }
 
     }
@@ -78,11 +77,11 @@ class Create {
 
     _copySketch(name, author) {
 
-        var origSketchPath = path.join(process.cwd(), 'sketch-kit/js/views/sketches/', name);
+        var origSketchPath = path.join(process.cwd(), 'sketch-kit/js/sketches/', name);
 
         var newName = this.args.length > 1 ? this.args[1] : name
-        newName = this._getSketchNameVersioned(newName);
-        var newSketchPath = './sketch-kit/js/views/sketches/' + newName;
+        newName = this._seeSketchTreeName(newName);
+        var newSketchPath = './sketch-kit/js/sketches/' + newName;
 
         return new Promise((resolve, reject) => {
 
@@ -100,7 +99,7 @@ class Create {
 
                     fs.copy(sassPath, newSassPath).then(async () => {
 
-                        await this._writeSketch(newName, author, newSketchPath, newSassPath, name);
+                        await this._addSketchToTree(newName, author, newSketchPath, newSassPath, name);
 
                         resolve();
                     });
@@ -108,7 +107,6 @@ class Create {
             });
         });
     }
-
 
     /***
      * Copies sketch template to Sketch-Kit project and updates
@@ -118,27 +116,24 @@ class Create {
      * @param author
      * @private
      */
-    _createSketch(name, author) {
+    async _createSketch(name, author) {
 
         //cleanup names
         name = name.replace('-', '');
 
-        var sketchKitPath = './sketch-kit/js/views/sketches/' + name;
+        var sketchKitPath = './sketch-kit/js/sketches/' + name;
         var sassPath = './sketch-kit/scss/sketches';
 
-        return new Promise((resolve, reject) => {
-            return this._createScript(name)
-                .then(this._createSass(name))
-                .then(async () => {
-
-                    await this._writeSketch(name, author, sketchKitPath, sassPath);
-
-                    resolve();
-                });
-        });
+        try {
+            await this._createScript(name, sketchKitPath);
+            await this._createSass(name);
+            await this._addSketchToTree(name, author, sketchKitPath, sassPath);
+        } catch (e) {
+            console.log('createSketch error : ' + e.message);
+        }
     }
 
-    async _writeSketch(name, author, jsPath, sassPath, nameReplace) {
+    async _addSketchToTree(name, author, jsPath, sassPath, nameReplace) {
 
         nameReplace = nameReplace || '{sketchname}';
 
@@ -157,49 +152,28 @@ class Create {
             'author': author
         };
 
-        this._seeConfigRelations();
-
+        this._seeConfigSketchTree();
         var sketchConfigPath = this._getConfigPath();
-        await fs.writeFileSync(sketchConfigPath, JSON.stringify(this.sketchConfig, null, 4));
-
+        await fs.writeFile(sketchConfigPath, JSON.stringify(this.sketchConfig, null, 4));
     }
 
-    _createScript(name) {
-        return new Promise((resolve, reject) => {
-            var templatePath = path.resolve(__dirname, '../');
-            templatePath = path.join(templatePath, '/lib/templates/script.txt');
-            var sketchKitPath = './sketch-kit/js/views/sketches/' + name + '/' + name + '.js';
-            //copy and rename
-            fs.copy(templatePath, sketchKitPath).then(() => {
-                resolve();
-            });
-        });
+    _createScript(name, jsPath) {
+        var templatePath = path.resolve(__dirname, '../');
+        templatePath = path.join(templatePath, '/lib/templates/script.txt');
+        var sketchKitPath = path.join(jsPath, '/' + name + '.js');
+        //copy and rename
+        return fs.copy(templatePath, sketchKitPath);
     }
 
     _createSass(name) {
-        return new Promise((resolve, reject) => {
-            var templatePath = path.resolve(__dirname, '../');
-            templatePath = path.join(templatePath, '/lib/templates/sass.txt');
-            var sassPath = './sketch-kit/scss/sketches/_' + name + '.scss';
-            //copy and rename
-            fs.copy(templatePath, sassPath).then(() => {
-                resolve();
-            });
-        });
+        var templatePath = path.resolve(__dirname, '../');
+        templatePath = path.join(templatePath, '/lib/templates/sass.txt');
+        var sassPath = './sketch-kit/scss/sketches/_' + name + '.scss';
+        //copy and rename
+        return fs.copy(templatePath, sassPath)
     }
 
-    _getSassTemplate(name) {
-        return new Promise(resolve => {
-            var templatePath = path.resolve(__dirname, '../');
-            templatePath = path.join(templatePath, '/lib/templates/script.txt');
-            fs.readFile(templatePath, 'utf8', (err, txt) => {
-                if (err) console.error(err.message);
-                resolve(txt);
-            });
-        });
-    }
-
-    _seeConfigRelations() {
+    _seeConfigSketchTree() {
 
         var sketches = this.sketchConfig.sketches;
 
@@ -217,15 +191,12 @@ class Create {
                     if (child.indexOf(name) == 0) {
 
                         //check root version
-                        var parentVersion = this._versionRoot(child);
+                        var parentVersion = this._seeRoot(child);
                         if (parentVersion == version) {
                             children.push(child);
                         }
-
                     }
-
                 }
-
             }
 
             if (children.length) {
@@ -236,21 +207,21 @@ class Create {
 
     }
 
-    _version(name) {
+    _seeTreeDepth(name) {
         var lastIndex = name.lastIndexOf('_');
         return name.substring(lastIndex);
     }
 
-    _versionRoot(name) {
+    _seeRoot(name) {
         var lastIndex = name.lastIndexOf('_');
         name = name.substring(0, lastIndex);
         return name.substring(name.indexOf('_'));
     }
 
-    _getSketchNameVersioned(parent) {
+    _seeSketchTreeName(parent) {
 
         var sketches = this.sketchConfig.sketches;
-        var parentVersion = this._version(parent);
+        var parentVersion = this._seeTreeDepth(parent);
 
         var children = [];
         for (var name in sketches) {
@@ -259,7 +230,7 @@ class Create {
                 //check root
                 if (name.indexOf(parent) == 0) {
                     //check version root
-                    var versionRoot = this._versionRoot(name);
+                    var versionRoot = this._seeRoot(name);
                     if (versionRoot == parentVersion)
                         children.push(name);
                 }

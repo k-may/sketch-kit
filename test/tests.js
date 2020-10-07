@@ -14,42 +14,36 @@ before(() => {
     sketches = new Sketches({debug: true});
 });
 
-after(() => {
-    setTimeout(() => {
-        fs.removeSync(sketchesPath, {}, err=>{
-            console.log(err);
-        })
-    }, 100);
-});
 
 //========================================================
 
-describe('SketchKit A : init', () => {
+//describe('SketchKit A : init', () => {
     it('sketch-kit/ folder created', async () => {
 
         //remove previous version
         //await fs.removeSync(sketchesPath);
 
-        return sketches.init().then(async () => {
-            var folderExist = await fs.existsSync(sketchesPath);
-
-            assert(folderExist, 'folder is not created');
-        });
+        await sketches.init()
+        var folderExist = await fs.existsSync(sketchesPath);
+        assert(folderExist, 'sketch-kit initialized');
 
     });
+    it('sketch created', async  () =>{
 
-    it('sketch created', function () {
+        await sketches.create(['test']);
 
-        return sketches.create(['test']).then(async () => {
+        var sketchPath = path.join(sketchesPath, '/js/sketches/test');
+        var folderExist = await fs.existsSync(sketchPath);
 
-            var sketchPath = path.join(sketchesPath, '/js/views/sketches/test');
-            var folderExist = await fs.existsSync(sketchPath);
-
-            assert(folderExist, 'folder is not created');
-
-        });
+        assert(folderExist, 'sketch was created');
 
     });
+//})
+
+after(() => {
+    fs.removeSync(sketchesPath, {}, err => {
+        console.log(err);
+    })
 });
 
 //--------------------------------------------------------
