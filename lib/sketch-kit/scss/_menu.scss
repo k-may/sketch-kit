@@ -20,6 +20,7 @@
     }
 
     li {
+      font-family: "Major Mono Display";
       white-space: nowrap;
       display: none;
       width: auto;
@@ -32,10 +33,12 @@
 
       &.active {
         background: rgba(228, 228, 228, 0.72);
+        color: #000;
       }
 
       &:hover {
         background: rgba(238, 238, 238, 0.7);
+        color: #000;
       }
 
     }

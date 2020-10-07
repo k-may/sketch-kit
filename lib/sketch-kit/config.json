@@ -1,5 +1,11 @@
 {
   "sketches": {
+    "SketchKit": {
+      "date": "",
+      "author": "kevma"
+    }
   },
-  "include_modules": true
+  "include_modules": true,
+  "project": "",
+  "copyDependencies": true
 }
