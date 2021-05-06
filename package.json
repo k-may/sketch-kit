@@ -27,23 +27,23 @@
   },
   "homepage": "https://github.com/k-may/sketch-kit",
   "dependencies": {
-    "chai": "latest",
+    "chai": "^4.3.4",
     "copy-node-modules": "^1.0.4",
-    "fs-extra": "latest",
+    "fs-extra": "^10.0.0",
     "gulp": "^4.0.2",
     "gulp-autoprefixer": "latest",
-    "gulp-load-plugins": "latest",
+    "gulp-load-plugins": "^2.0.6",
     "gulp-plumber": "latest",
     "gulp-sass": "latest",
     "gulp-sass-glob": "latest",
-    "inquirer": "latest",
+    "inquirer": "^8.0.0",
     "minimist": "latest",
     "path": "latest",
-    "replace": "latest",
+    "replace": "^1.2.1",
     "v4": "0.0.1"
   },
   "devDependencies": {
-    "browser-sync": "^2.26.7",
+    "browser-sync": "^2.26.14",
     "os": "^0.1.1"
   }
 }

@@ -38,8 +38,8 @@ class Update {
 
                     copyNodeModules(srcDir, dstDir, {devDependencies: false}, function (err, results) {
                         if (err) {
-                            console.error(err);
-                            return;
+                            console.warn(err);
+                            resolve();
                         }
                         for (var i in results) {
                             console.log('package name:' + results[i].name + ' version:' + results[i].version);
