@@ -1,6 +1,7 @@
 /* eslint-disable no-undef */
 var path = require('path');
 var sassGlob = require('gulp-sass-glob');
+var sass = require('gulp-sass')(require('sass'));
 var plugins = require('gulp-load-plugins')();
 
 module.exports = function(gulp, plugins, config) {
@@ -13,7 +14,7 @@ module.exports = function(gulp, plugins, config) {
         gulp.src(src)
             .pipe(sassGlob())
             .pipe(plugins.plumber())
-            .pipe(plugins.sass())
+            .pipe(sass())
             .pipe(plugins.autoprefixer({browsers: ['last 2 versions', 'ie 11', 'safari >= 8', 'ios 9', 'android 4']}))
             .pipe(gulp.dest(dest));
     };
