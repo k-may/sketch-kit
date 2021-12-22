@@ -1,5 +1,13 @@
+@import "reset";
 @import "menu";
-@import "sketches/*.scss";
+@import "sketches/SketchKit.scss";
+
+:root{
+  font-size: 16px;
+  @media (min-width: 900px) {
+    font-size: 18px;
+  }
+}
 
 body {
   overscroll-behavior-y: none;

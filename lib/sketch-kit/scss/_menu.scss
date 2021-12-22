@@ -3,21 +3,22 @@
   position: fixed;
   z-index: 1000;
 
+  button {
+    margin: 4px 0;
+    width: 22px;
+    height: 22px;
+    background-color: rgba(238, 238, 238, 0.7);
+    border: none;
+    border-radius: 0;
+    pointer-events: none;
+  }
+
   ul {
     position: absolute;
     top: 0;
     z-index: 200;
     font-size: 13px;
     padding-left: 20px;
-
-    button {
-      margin: 4px 0;
-      width: 22px;
-      height: 22px;
-      background-color: rgba(238, 238, 238, 0.7);
-      border: none;
-      border-radius: 0;
-    }
 
     li {
       font-family: "Major Mono Display";
@@ -46,12 +47,14 @@
   }
 
   &:hover {
+
     button {
-      display: none;
+      visibility: hidden;
     }
 
     li {
-      display: block;
+      visibility: visible;
+      //display: block;
     }
   }
 
