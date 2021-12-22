@@ -44,6 +44,7 @@ module.exports = class Main {
 
         await this._copyApp();
         await this._copyConfig(result);
+        await this._updateIgnore();
 
     }
 
@@ -135,6 +136,25 @@ module.exports = class Main {
 
         await fs.writeFile(path, JSON.stringify(config, null, 4));
 
+    }
+
+    /**
+     * Make sure copied node modules aren't included in the repo..
+     *
+     * @return {Promise<unknown>}
+     * @private
+     */
+    async _updateIgnore() {
+
+        const ignorePath = path.join(process.cwd(), '.gitignore');
+        return new Promise(resolve => {
+            fs.appendFile(ignorePath, '!/sketch-kit/js/node_modules/', function (err) {
+                if (err)
+                    console.log(err.message);
+
+                resolve();
+            });
+        })
     }
 
 };
