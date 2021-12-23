@@ -148,7 +148,7 @@ module.exports = class Main {
 
         const ignorePath = path.join(process.cwd(), '.gitignore');
         return new Promise(resolve => {
-            fs.appendFile(ignorePath, '!/sketch-kit/js/node_modules/', function (err) {
+            fs.appendFile(ignorePath, '/sketch-kit/js/node_modules/', function (err) {
                 if (err)
                     console.log(err.message);
 
