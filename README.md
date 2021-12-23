@@ -10,7 +10,7 @@ The idea being that the more time I can spend on the fun bits (vs the boring dev
 
 **Features**:
 - entirely es6
-- no bundling (for better debugging and edit-and-continue)
+- vite
 
 ## Setup
 
@@ -25,7 +25,7 @@ When the sketch is selected from the menu (top left, very discrete) the js for t
 
 This is called by default by the following commands. Copies dependencies from package.json into the sketches folder.
 
-Note; as of writing, most npm dependencies don't support es6 modules, to import deps into your sketch you'll most likely need to do something like the following to statically import them :
+**Note;** as of writing, most npm dependencies don't support es6 modules, to import deps into your sketch you'll most likely need to do something like the following to statically import them :
 
 ```
 import '../../../node_modules/[library path]
@@ -67,7 +67,7 @@ sketches/
 
 sketch-kit will start up browser-sync and the watch tasks for your scss.
 
-Note; I've purposely left minification and bundling out of the framework so that its possible to use js modules only. We've bundling for the vendor files only
+**Note;** I've purposely left minification and bundling out of the framework so that its possible to use js modules only. We've bundling for the vendor files only
 
 ### Create
 
@@ -76,3 +76,5 @@ Note; I've purposely left minification and bundling out of the framework so that
 sketch-kit will add a new sketch to your sketches and wil now be available in the menu. This sketch includes the base sketch view template and a scss file with the sketch name being used as the css class reference.
 
 If the sketch already exists, you'll be prompted to copy or replace, creating a new nested iteration.
+
+**Note;** give sketches unique names to ensure that there aren't conflicts when copying. The replace method will search through the code and indescriminately replace the sketch name with whatever the next sketch name will be

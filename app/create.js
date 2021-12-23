@@ -17,7 +17,6 @@ class Create {
     async start() {
         var config = await this._getConfig();
         if (this.sketchName) {
-            //return this._createSketch(this.sketchName, os.userInfo().username);
             await this._tryCreateSketch(this.sketchName, os.userInfo().username);
         } else
             await this._prompt();
@@ -135,7 +134,7 @@ class Create {
         }
     }
 
-    replaceNameInFile(regex, replacement, paths){
+    replaceNameInFile(regex, replacement, paths) {
 
         try {
             paths = Array.isArray(paths) ? paths : [paths];
@@ -148,8 +147,8 @@ class Create {
                 recursive: true,
                 silent: true,
             });
-        }catch(e){
-            console.log("Replace error : ", e);
+        } catch (e) {
+            console.log('Replace error : ', e);
             console.log({regex, replacement, paths});
         }
     }
@@ -207,15 +206,27 @@ class Create {
     _seeConfigSketchTree() {
 
         const {sketches} = this.sketchConfig;
-        for (var name in sketches) {
+        for (var current in sketches) {
             var children = [];
-            var lastIndex = name.lastIndexOf('_');
-            var version = name.substring(lastIndex);
+            var lastIndex = current.lastIndexOf('_');
+            var version = current.substring(lastIndex + 1);
+            // console.log("\n=== " + name + " ===");
             for (var child in sketches) {
-                if (name !== child && child.indexOf(name) == 0) {
-                    //check root version
-                    var parentVersion = this._seeRoot(child);
-                    if (parentVersion == version) {
+                // console.log(name + " v " + child);
+
+                if (current !== child && child.indexOf(current) == 0) {
+                    //see if child branches directly from current
+                    let childDepth = this._getDepth(child);
+                    //step one branch back...
+                    childDepth.pop();
+                    childDepth = childDepth.join('');
+
+                    const parentDepth = this._getDepth(current).join('');
+
+                    // console.log("c : " + childDepth," p : " + parentDepth);
+
+                    if (childDepth === parentDepth) {
+                        // console.log("add!!!");
                         children.push(child);
                     }
                 }
@@ -223,7 +234,7 @@ class Create {
 
             if (children.length) {
                 children.sort();
-                sketches[name].children = children;
+                sketches[current].children = children;
             }
         }
 
@@ -234,32 +245,46 @@ class Create {
         return name.substring(lastIndex);
     }
 
+    /**
+     * Converts branching syntax to multidimensional array
+     * @param name
+     * @return {string[]}
+     * @private
+     */
+    _getDepth(name) {
+        return name.substring(name.indexOf('_')).replace(/_/g, '').split('');
+    }
+
     _seeRoot(name) {
         var lastIndex = name.lastIndexOf('_');
         name = name.substring(0, lastIndex);
         return name.substring(name.indexOf('_'));
     }
 
-    _seeSketchTreeName(parent) {
+    _seeSketchTreeName(current) {
 
         const {sketches} = this.sketchConfig;
-        var parentVersion = this._seeTreeDepth(parent);
+
+        var parentVersion = this._getDepth(current)
+        parentVersion = parentVersion.join('');
 
         var children = [];
         for (var name in sketches) {
 
-            if (parent != name) {
-                //check root
-                if (name.indexOf(parent) == 0) {
-                    //check version root
-                    var versionRoot = this._seeRoot(name);
-                    if (versionRoot == parentVersion)
-                        children.push(name);
+            if (current != name && name.indexOf(current) == 0) {
+                //check version root
+                var versionRoot = this._getDepth(name)
+                versionRoot.pop()
+                versionRoot = versionRoot.join(''); //this._seeRoot(name);
+                // console.log("p :" + parentVersion + " v : " + versionRoot);
+                if (versionRoot == parentVersion) {
+                    // console.log("add!");
+                    children.push(name);
                 }
             }
         }
 
-        return parent + '_' + (children.length + 1);
+        return current + '_' + (children.length + 1);
     }
 
     _getPromptConfig() {
