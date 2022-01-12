@@ -35,7 +35,7 @@
     "path": "latest",
     "replace": "^1.2.1",
     "sass": "^1.45.1",
-    "vite": "^2.7.6"
+    "vite": "^2.7.10"
   },
   "devDependencies": {
     "os": "^0.1.2"

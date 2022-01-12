@@ -19,12 +19,14 @@ class Run {
         const server = await createServer({
             // any valid user config options, plus `mode` and `configFile`
             root: publicDir,
+            mode : "development",
             server: {
-                port: 3001,
-                hmr : {
-                    protocol: 'ws',
+                port: 3002,
+                host: true,
+                /*hmr : {
+                    protocol: 'wss',
                     host : "localhost"
-                }
+                }*/
             }
         })
         await server.listen()
