@@ -26,10 +26,10 @@ class Run {
             server: {
                 port: 3002,
                 host: true,
-                /*hmr : {
+                hmr : {
                     protocol: 'wss',
                     host : "localhost"
-                }*/
+                }
             },
             plugins : [
                 glslify()
