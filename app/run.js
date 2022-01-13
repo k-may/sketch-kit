@@ -3,6 +3,9 @@ var path = require('path');
 var fs = require('fs');
 
 const {createServer} = require('vite');
+const {glslify} = require('vite-plugin-glslify');
+
+console.log(glslify);
 
 class Run {
 
@@ -27,7 +30,10 @@ class Run {
                     protocol: 'wss',
                     host : "localhost"
                 }*/
-            }
+            },
+            plugins : [
+                glslify()
+            ]
         })
         await server.listen()
         server.printUrls()

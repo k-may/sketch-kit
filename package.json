@@ -38,6 +38,8 @@
     "vite": "^2.7.10"
   },
   "devDependencies": {
-    "os": "^0.1.2"
+    "mocha": "^9.1.3",
+    "os": "^0.1.2",
+    "vite-plugin-glslify": "^2.0.1"
   }
 }
