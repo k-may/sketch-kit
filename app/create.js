@@ -3,6 +3,7 @@ var fs = require('fs-extra');
 var os = require('os');
 var path = require('path');
 var replace = require('replace');
+var utils = require('./utils.js');
 
 class Create {
 
@@ -74,39 +75,21 @@ class Create {
         });
     }
 
-    _copySketch(name, author) {
+    async _copySketch(name, author) {
 
-        var origSketchPath = path.join(process.cwd(), 'sketch-kit/js/sketches/', name);
+        var origSketchPath = path.join(process.cwd(), 'sketch-kit/js/sketches/', name + "/" + name + ".js");
+        var origSassPath = path.join(process.cwd(), 'sketch-kit/scss/sketches/_' + name + '.scss');
 
         var newName = this.args.length > 1 ? this.args[1] : name
         newName = this._seeSketchTreeName(newName);
-        var newSketchPath = './sketch-kit/js/sketches/' + newName;
 
-        return new Promise((resolve, reject) => {
-
-            //copy original
-            fs.copy(origSketchPath, newSketchPath).then(() => {
-
-                //rename js
-                var origFileName = path.join(newSketchPath, name + '.js');
-                var newFileName = path.join(newSketchPath, newName + '.js');
-
-                fs.rename(origFileName, newFileName).then(() => {
-
-                    var sassPath = path.join(process.cwd(), 'sketch-kit/scss/sketches/_' + name + '.scss');
-                    var newSassPath = path.join(process.cwd(), 'sketch-kit/scss/sketches/_' + newName + '.scss');
-
-                    fs.copy(sassPath, newSassPath).then(async () => {
-
-                        this.replaceNameInFile(name, newName, [newSketchPath, newSassPath]);
-
-                        await this._addSketchToTree(newName, author, newSketchPath, newSassPath, name);
-
-                        resolve();
-                    });
-                });
-            });
-        });
+        try {
+        await this._createScript(newName, origSketchPath, name);
+        await this._createSass(newName, origSassPath, name);
+        await this._addSketchToTree(newName, author);
+        } catch (e) {
+            console.log('copySketch error : ' + e.message);
+        }
     }
 
     /***
@@ -123,37 +106,17 @@ class Create {
         name = name.replace('-', '');
 
         var sketchKitPath = './sketch-kit/js/sketches/' + name;
-        var sassPath = './sketch-kit/scss/sketches';
 
         try {
-            await this._createScript(name, sketchKitPath);
+            await this._createScript(name);
             await this._createSass(name);
-            await this._addSketchToTree(name, author, sketchKitPath, sassPath);
+            await this._addSketchToTree(name, author);
         } catch (e) {
             console.log('createSketch error : ' + e.message);
         }
     }
 
-    replaceNameInFile(regex, replacement, paths) {
-
-        try {
-            paths = Array.isArray(paths) ? paths : [paths];
-            paths = paths.map(p => path.resolve(p));
-            //replace all sketchnames throughout templates
-            replace({
-                regex,
-                replacement,
-                paths,
-                recursive: true,
-                silent: true,
-            });
-        } catch (e) {
-            console.log('Replace error : ', e);
-            console.log({regex, replacement, paths});
-        }
-    }
-
-    async _addSketchToTree(name, author, jsPath, sassPath, nameReplace) {
+    async _addSketchToTree(name, author) {
 
         //add new sketch config to sketch-kit/data/config.json
         this.sketchConfig.sketches[name] = {
@@ -166,31 +129,43 @@ class Create {
         await fs.writeFile(sketchConfigPath, JSON.stringify(this.sketchConfig, null, 4));
     }
 
-    async _createScript(name, jsPath) {
-        var templatePath = path.resolve(__dirname, '../');
-        templatePath = path.join(templatePath, '/lib/templates/script.txt');
-        var sketchKitPath = path.join(jsPath, '/' + name + '.js');
+    async _createScript(name, templatePath, replaceName) {
+
+        if(!templatePath) {
+             templatePath = path.resolve(__dirname, '../');
+            templatePath = path.join(templatePath, '/lib/templates/script.txt');
+        }
+
+        var sketchKitPath = './sketch-kit/js/sketches/' + name + "/" + name + ".js";
+        //var sketchKitPath = path.join(jsPath, '/' + name + '.js');
         //copy and rename
         await fs.copy(templatePath, sketchKitPath);
 
         //replace all sketchnames throughout templates
-        this.replaceNameInFile('{sketchname}', name, sketchKitPath);
+        replaceName = replaceName || '{sketchname}';
+
+        utils.replaceNameInFile(replaceName, name, sketchKitPath);
     }
 
-    async _createSass(name) {
-        var templatePath = path.resolve(__dirname, '../');
-        templatePath = path.join(templatePath, '/lib/templates/sass.txt');
+    async _createSass(name, templatePath, replaceName) {
+
+        if (!templatePath) {
+            templatePath = path.resolve(__dirname, '../');
+            templatePath = path.join(templatePath, '/lib/templates/sass.txt');
+        }
+
         var sassPath = './sketch-kit/scss/sketches/_' + name + '.scss';
         //copy and rename
         await fs.copy(templatePath, sassPath);
 
         //replace all sketchnames throughout templates
-        this.replaceNameInFile('{sketchname}', name, sassPath);
+        replaceName = replaceName || '{sketchname}';
+        utils.replaceNameInFile(replaceName, name, sassPath);
 
         //append import to entry point..
         var sassEntryPath = './sketch-kit/scss/main.scss';
         return new Promise((resolve => {
-            const entrySass = fs.readFile(sassEntryPath, 'utf8', (err, data) => {
+            fs.readFile(sassEntryPath, 'utf8', (err, data) => {
                 if (err) {
                     console.log(err.message);
                     throw err;
@@ -208,25 +183,17 @@ class Create {
         const {sketches} = this.sketchConfig;
         for (var current in sketches) {
             var children = [];
-            var lastIndex = current.lastIndexOf('_');
-            var version = current.substring(lastIndex + 1);
-            // console.log("\n=== " + name + " ===");
-            for (var child in sketches) {
-                // console.log(name + " v " + child);
 
+            for (var child in sketches) {
                 if (current !== child && child.indexOf(current) == 0) {
                     //see if child branches directly from current
                     let childDepth = this._getDepth(child);
                     //step one branch back...
                     childDepth.pop();
-                    childDepth = childDepth.join('');
 
-                    const parentDepth = this._getDepth(current).join('');
+                    const parentDepth = this._getDepth(current);
 
-                    // console.log("c : " + childDepth," p : " + parentDepth);
-
-                    if (childDepth === parentDepth) {
-                        // console.log("add!!!");
+                    if (JSON.stringify(childDepth) === JSON.stringify(parentDepth)) {
                         children.push(child);
                     }
                 }
@@ -252,7 +219,15 @@ class Create {
      * @private
      */
     _getDepth(name) {
-        return name.substring(name.indexOf('_')).replace(/_/g, '').split('');
+        const index = (name.indexOf('_'))
+        if (index > -1) {
+            const substring = index > -1 ? name.substring(index) : index;
+            const depth = substring.replace(/_/g, '').split('').map(num => parseInt(num))
+            return depth;
+        } else {
+            //initial sketch....
+            return [];
+        }
     }
 
     _seeRoot(name) {
@@ -266,7 +241,6 @@ class Create {
         const {sketches} = this.sketchConfig;
 
         var parentVersion = this._getDepth(current)
-        parentVersion = parentVersion.join('');
 
         var children = [];
         for (var name in sketches) {
@@ -275,10 +249,7 @@ class Create {
                 //check version root
                 var versionRoot = this._getDepth(name)
                 versionRoot.pop()
-                versionRoot = versionRoot.join(''); //this._seeRoot(name);
-                // console.log("p :" + parentVersion + " v : " + versionRoot);
-                if (versionRoot == parentVersion) {
-                    // console.log("add!");
+                if (JSON.stringify(versionRoot) == JSON.stringify(parentVersion)) {
                     children.push(name);
                 }
             }

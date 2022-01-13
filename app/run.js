@@ -25,9 +25,8 @@ class Run {
             mode : "development",
             server: {
                 port: 3002,
-                host: true,
                 hmr : {
-                    protocol: 'wss',
+                    protocol: 'ws',
                     host : "localhost"
                 }
             },
