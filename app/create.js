@@ -115,7 +115,7 @@ class Create {
             console.log('createSketch error : ' + e.message);
         }
     }
-
+g
     async _addSketchToTree(name, author) {
 
         //add new sketch config to sketch-kit/data/config.json
