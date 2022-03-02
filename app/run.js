@@ -1,4 +1,3 @@
-
 var path = require('path');
 var fs = require('fs');
 
@@ -22,20 +21,17 @@ class Run {
         const server = await createServer({
             // any valid user config options, plus `mode` and `configFile`
             root: publicDir,
-            mode : "development",
+            mode: 'development',
             server: {
                 port: 3002,
-                hmr : {
-                    protocol: 'ws',
-                    host : "localhost"
-                }
+                host: true,
+                hmr: true
             },
-            plugins : [
+            plugins: [
                 glslify()
             ]
         })
         await server.listen()
-        server.printUrls()
 
     }
 
