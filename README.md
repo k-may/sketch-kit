@@ -9,8 +9,9 @@ To help speed up the process of creating and running small experiments and proto
 The idea being that the more time I can spend on the fun bits (vs the boring dev-ops bits) the better and more expressive prototyping can be.
 
 **Features**:
-- entirely es6
 - vite
+- glslify
+- sass
 
 ## Setup
 
@@ -78,3 +79,10 @@ sketch-kit will add a new sketch to your sketches and wil now be available in th
 If the sketch already exists, you'll be prompted to copy or replace, creating a new nested iteration.
 
 **Note;** give sketches unique names to ensure that there aren't conflicts when copying. The replace method will search through the code and indescriminately replace the sketch name with whatever the next sketch name will be
+
+
+### Build
+
+`sketch-kit build`
+
+sketch-kit will create a `build/` folder containing a static build of the project.
