@@ -3,6 +3,7 @@ var fs = require('fs');
 
 const {createServer} = require('vite');
 const {glslify} = require('vite-plugin-glslify');
+const dynamicImportVariables = require('@rollup/plugin-dynamic-import-vars').default;
 
 console.log(glslify);
 
@@ -10,7 +11,7 @@ class Run {
 
     constructor(config, args) {
 
-        this._tasksConfig = config;
+        this._config = config;
         this.args = args;
 
     }
@@ -18,6 +19,8 @@ class Run {
     async start() {
 
         const publicDir = path.resolve(process.cwd(), 'sketch-kit');
+        const includeDir =  path.resolve(publicDir, 'js/*')
+
         const server = await createServer({
             // any valid user config options, plus `mode` and `configFile`
             root: publicDir,
@@ -28,7 +31,10 @@ class Run {
                 hmr: true
             },
             plugins: [
-                glslify()
+                glslify(),
+                dynamicImportVariables({
+                    include : includeDir,
+                })
             ]
         })
         await server.listen()

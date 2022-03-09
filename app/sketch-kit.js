@@ -87,6 +87,16 @@ class SketchKit {
         });
     }
 
+    build(args) {
+        this.update().then(() => {
+            var Build = require('./build');
+            var build = new Build(this.config, args);
+            return build.start();
+        }).catch(e => {
+            console.log('Build error : ' + e);
+        })
+    }
+
     //-----------------------------------------------------
 
     /***

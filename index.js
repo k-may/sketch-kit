@@ -20,6 +20,8 @@ switch (action) {
     case 'init':
         s.init(args);
         break;
+    case 'build':
+        s.build(args);
     default :
         s.update(args);
         break;
