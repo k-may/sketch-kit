@@ -8,7 +8,6 @@ class SketchKit {
 
     constructor(options) {
 
-        console.log("wtf");
         this.config = {
             'debug': options.debug !== undefined ? options.debug : false,
             'root': 'sketch-kit',
