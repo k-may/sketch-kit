@@ -6,18 +6,39 @@ Rapid prototyping framework for HTML5 projects
 
 To help speed up the process of creating and running small experiments and prototypes I've developed some tools which I believe take much of the pain out of the experience.
 
-The idea being that the more time I can spend on the fun bits (vs the boring dev-ops bits) the better and more expressive prototyping can be.
+The idea being; the more time one can spend on the fun bits (vs the boring dev-ops bits) the better and more expressive prototyping can be.
+
+Sketch-Kit is designed to live along-side your project (a sketch-kit/ folder will exist in the project root), to provide a sand-box infrastructure where you can work through solutions. Sketch-Kit is ideal for :
+- **Experimenting** with js libraries used in your project code
+- **Nuancing transitions** (without having to navigate and potentially contaminate project code)
+- **Sharing** code examples with your team
+- Quick **iteration** on sketches
+- Not being bound to a _conservative and safety-first_ developer mindset, allowing developers to have a little fun and **be expressive**!
 
 **Features**:
-- vite
-- glslify
+- [vite](https://vitejs.dev/) (HMR, development, building)
+- [glslify](https://github.com/glslify/glslify)
 - sass
 
 ## Setup
 
-Each 'sketch' gets a javascript file and scss file generated on creation.
+Each '_sketch_' gets a javascript file and scss file generated on creation.
 
-When the sketch is selected from the menu (top left, very discrete) the js for the sketch is imported and attached to a dom element on the page. This element is exposed as this.el.
+When the sketch is selected from the menu (top left, very discrete) the js for the sketch is imported and attached to a dom element on the page. This element is exposed as `this.el`.
+
+Each sketch exposes a interface for commonly used methods, the most important being '_draw_' : 
+
+```js
+    /**
+     * All rendering should be placed here. Tick durations are clamped to 60fps
+     * @param time : number
+     * @param deltaTime : number
+     */
+    draw({time, deltaTime}) {
+        //rendering goes here!
+    }
+
+```
 
 ## Commands
 ### Update
