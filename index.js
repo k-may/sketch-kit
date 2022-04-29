@@ -2,8 +2,8 @@
 /* eslint-disable no-undef */
 
 var argv = require('minimist')(process.argv.slice(2));
-var Sketches = require('./app/sketch-kit');
-var s = new Sketches({
+var SketchKit = require('./app/sketch-kit');
+var s = new SketchKit({
     debug: false
 });
 
@@ -23,6 +23,7 @@ switch (action) {
     case 'build':
         s.build(args);
     default :
+        console.log("No Command, will update")
         s.update(args);
         break;
 

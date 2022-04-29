@@ -5,6 +5,7 @@ class SketchKit {
 
     //TODO add clean task
 
+
     constructor(options) {
 
         this.config = {
