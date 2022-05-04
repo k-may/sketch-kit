@@ -19,9 +19,9 @@ class Run {
     async start() {
 
         const publicDir = path.resolve(process.cwd(), 'sketch-kit');
-        const includeDir =  path.resolve(publicDir, 'js/*')
+        const includeDir = path.resolve(publicDir, 'js/*')
 
-        const server = await createServer({
+        const config = {
             // any valid user config options, plus `mode` and `configFile`
             root: publicDir,
             mode: 'development',
@@ -31,13 +31,36 @@ class Run {
                 hmr: true
             },
             plugins: [
-                glslify(),
-                dynamicImportVariables({
-                    include : includeDir,
-                })
+                glslify()
             ]
-        })
+        }
+
+        try {
+            //try to load cert files..
+            //todo add to documentation
+
+            let filePath = path.resolve(process.cwd(), '.cert/key.pem');
+            const keyFile = fs.readFileSync(filePath);
+
+            filePath = path.resolve(process.cwd(), '.cert/cert.pem');
+            const certFile = fs.readFileSync(filePath);
+
+
+            if (keyFile && certFile) {
+                config.server.https = {
+                    key: keyFile,
+                    cert: certFile
+                }
+            }
+
+            console.log(config)
+        }catch(e){
+            console.log(e);
+        }
+
+        const server = await createServer(config);
         await server.listen()
+
 
     }
 
