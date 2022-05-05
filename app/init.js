@@ -13,6 +13,9 @@ module.exports = class Main {
     }
 
     run() {
+
+        utils.log("Init");
+
         if (this._IsInitialized()) {
             throw new Error('Sketch-Kit already initialized');
         } else {
@@ -70,12 +73,12 @@ module.exports = class Main {
         var defaultName = path.basename(path.dirname(process.cwd()));
         return [{
             'type': 'input',
-            'message': 'Project name',
+            'message': '\x1b[33mProject name',
             'name': 'sketch',
             'default': defaultName
         }, {
             'type': 'input',
-            'message': 'Copy Node Dependencies',
+            'message': '\x1b[33mWould you like to include node dependencies?',
             'name': 'copyDependencies',
             'choices': ['yes', 'no'],
             'default': 'yes',
