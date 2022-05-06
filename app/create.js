@@ -16,6 +16,9 @@ class Create {
     }
 
     async start() {
+
+        utils.log("Create");
+
         var config = await this._getConfig();
         if (this.sketchName) {
             await this._tryCreateSketch(this.sketchName, os.userInfo().username);
@@ -59,7 +62,7 @@ class Create {
     _seeReplaceOrCopy() {
         inquirer.prompt({
             'type': 'list',
-            'message': 'Sketch already exists, would like to replace it or copy it',
+            'message': '\x1b[33mSketch already exists, would you like to replace it or copy it?',
             'name': 'replace',
             'choices': ['copy', 'replace', 'niether']
         }).then(result => {
@@ -77,16 +80,16 @@ class Create {
 
     async _copySketch(name, author) {
 
-        var origSketchPath = path.join(process.cwd(), 'sketch-kit/js/sketches/', name + "/" + name + ".js");
+        var origSketchPath = path.join(process.cwd(), 'sketch-kit/js/sketches/', name + '/' + name + '.js');
         var origSassPath = path.join(process.cwd(), 'sketch-kit/scss/sketches/_' + name + '.scss');
 
-        var newName = this.args.length > 1 ? this.args[1] : name
-        newName = this._seeSketchTreeName(newName);
+        //if new name, will create a new tree
+        var newName = this.args.length > 1 ? this.args[1] : this._seeSketchTreeName(name);
 
         try {
-        await this._createScript(newName, origSketchPath, name);
-        await this._createSass(newName, origSassPath, name);
-        await this._addSketchToTree(newName, author);
+            await this._createScript(newName, origSketchPath, name, true);
+            await this._createSass(newName, origSassPath, name);
+            await this._addSketchToTree(newName, author);
         } catch (e) {
             console.log('copySketch error : ' + e.message);
         }
@@ -115,6 +118,7 @@ class Create {
             console.log('createSketch error : ' + e.message);
         }
     }
+
     async _addSketchToTree(name, author) {
 
         //add new sketch config to sketch-kit/data/config.json
@@ -128,25 +132,37 @@ class Create {
         await fs.writeFile(sketchConfigPath, JSON.stringify(this.sketchConfig, null, 4));
     }
 
-    async _createScript(name, templatePath, replaceName) {
+    async _createScript(name, templatePath, replaceName, copyDeps) {
 
-        if(!templatePath) {
-             templatePath = path.resolve(__dirname, '../');
+        if (!templatePath) {
+            templatePath = path.resolve(__dirname, '../');
             templatePath = path.join(templatePath, '/lib/templates/script.txt');
         }
 
-        var sketchKitPath = './sketch-kit/js/sketches/' + name + "/" + name + ".js";
-        //var sketchKitPath = path.join(jsPath, '/' + name + '.js');
-        //copy and rename
+        var sketchFolder = './sketch-kit/js/sketches/' + name + '/';
+        var sketchKitPath = sketchFolder + name + '.js';
         await fs.copy(templatePath, sketchKitPath);
 
         //replace all sketchnames throughout templates
         replaceName = replaceName || '{sketchname}';
 
         utils.replaceNameInFile(replaceName, name, sketchKitPath);
+
+        //copy deps
+        if(copyDeps) {
+            const templateFileName = path.basename(templatePath);
+            const templateDirName = path.dirname(templatePath);
+            const files = await fs.promises.readdir(templateDirName);
+            files.forEach(async (file) => {
+                if (file !== templateFileName) {
+                    await fs.copy(path.join(templateDirName, file), sketchFolder + file);
+                }
+            });
+        }
     }
 
     async _createSass(name, templatePath, replaceName) {
+
 
         if (!templatePath) {
             templatePath = path.resolve(__dirname, '../');
@@ -154,6 +170,9 @@ class Create {
         }
 
         var sassPath = './sketch-kit/scss/sketches/_' + name + '.scss';
+
+        console.log({name, templatePath, replaceName, sassPath});
+
         //copy and rename
         await fs.copy(templatePath, sassPath);
 
@@ -260,11 +279,11 @@ class Create {
     _getPromptConfig() {
         return [{
             'type': 'input',
-            'message': 'Sketch name',
+            'message': '\x1b[33mSketch name',
             'name': 'sketch'
         }, {
             'type': 'input',
-            'message': 'Author',
+            'message': '\x1b[33mAuthor',
             'name': 'author',
             'default': os.userInfo().username
         }];

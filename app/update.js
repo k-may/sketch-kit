@@ -1,5 +1,6 @@
 var fs = require('fs-extra');
 var copyNodeModules = require('copy-node-modules');
+const utils = require('./utils.js');
 
 class Update {
 
@@ -8,6 +9,9 @@ class Update {
     }
 
     start() {
+
+        utils.log("Update");
+
         return this._copyDependencies();
     }
 

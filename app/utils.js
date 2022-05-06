@@ -37,5 +37,9 @@ module.exports = {
             console.log('Replace error : ', e);
             console.log({regex, replacement, paths});
         }
+    },
+
+    log : function(msg){
+        console.log('\n\x1b[33mSKETCH-KIT -> \x1b[1m %s \x1b[0m', msg);
     }
 }

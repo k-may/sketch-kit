@@ -3,6 +3,7 @@ var fs = require('fs');
 
 const {createServer} = require('vite');
 const {glslify} = require('vite-plugin-glslify');
+const utils = require('./utils.js');
 const dynamicImportVariables = require('@rollup/plugin-dynamic-import-vars').default;
 
 console.log(glslify);
@@ -17,6 +18,8 @@ class Run {
     }
 
     async start() {
+
+        utils.log("Run");
 
         const publicDir = path.resolve(process.cwd(), 'sketch-kit');
         const includeDir = path.resolve(publicDir, 'js/*')
