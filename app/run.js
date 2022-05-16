@@ -1,20 +1,16 @@
 var path = require('path');
 var fs = require('fs');
 
-const {createServer} = require('vite');
+const {createServer, defineConfig} = require('vite');
 const {glslify} = require('vite-plugin-glslify');
 const utils = require('./utils.js');
 const dynamicImportVariables = require('@rollup/plugin-dynamic-import-vars').default;
 
-console.log(glslify);
-
 class Run {
 
     constructor(config, args) {
-
+        this._args = args;
         this._config = config;
-        this.args = args;
-
     }
 
     async start() {
@@ -22,7 +18,6 @@ class Run {
         utils.log("Run");
 
         const publicDir = path.resolve(process.cwd(), 'sketch-kit');
-        const includeDir = path.resolve(publicDir, 'js/*')
 
         const config = {
             // any valid user config options, plus `mode` and `configFile`
@@ -35,8 +30,12 @@ class Run {
             },
             plugins: [
                 glslify()
-            ]
+            ],
+            define : {
+                __configFile__ : `"${this._config.configFile}"`
+            }
         }
+
 
         try {
             //try to load cert files..
@@ -56,14 +55,12 @@ class Run {
                 }
             }
 
-            console.log(config)
         }catch(e){
             console.log(e);
         }
 
         const server = await createServer(config);
         await server.listen()
-
 
     }
 
