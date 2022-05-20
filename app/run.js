@@ -4,7 +4,6 @@ var fs = require('fs');
 const {createServer, defineConfig} = require('vite');
 const {glslify} = require('vite-plugin-glslify');
 const utils = require('./utils.js');
-const dynamicImportVariables = require('@rollup/plugin-dynamic-import-vars').default;
 
 class Run {
 

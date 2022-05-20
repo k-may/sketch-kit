@@ -49,7 +49,10 @@ class Create {
         this.author = author;
 
         if (this.sketchConfig.sketches.hasOwnProperty(name)) {
-            this._seeReplaceOrCopy();
+            if(process.env.TEST)
+               return this._copySketch(this.sketchName, this.author)
+            else
+               this._seeReplaceOrCopy();
         } else if (name === '') {
             console.log('Name not valid');
             return this._prompt();
@@ -170,8 +173,6 @@ class Create {
         }
 
         var sassPath = './sketch-kit/scss/sketches/_' + name + '.scss';
-
-        console.log({name, templatePath, replaceName, sassPath});
 
         //copy and rename
         await fs.copy(templatePath, sassPath);

@@ -13,7 +13,7 @@ Sketch-Kit is designed to live along-side your project (a sketch-kit/ folder wil
 - **Nuancing transitions** (without having to navigate and potentially contaminate project code)
 - **Sharing** code examples with your team
 - Quick **iteration** on sketches
-- Not being bound to a _conservative and safety-first_ developer mindset, allowing developers to have a little fun and **be expressive**!
+- Not being bound to a _safety-first_ developer mindset, encourage developers to have a little fun and **be expressive**!
 
 **Features**:
 - [vite](https://vitejs.dev/) (HMR, development, building)
@@ -75,7 +75,7 @@ sketches/
 --------/scss
 --------/--------/sketches
 --------/index.html
---------/config.json
+--------/sketch-kit.config.json
 ```
 
 **Options**
@@ -89,7 +89,6 @@ sketches/
 
 sketch-kit will start up browser-sync and the watch tasks for your scss.
 
-**Note;** I've purposely left minification and bundling out of the framework so that its possible to use js modules only. We've bundling for the vendor files only
 
 ### Create
 
@@ -107,3 +106,14 @@ If the sketch already exists, you'll be prompted to copy or replace, creating a 
 `sketch-kit build`
 
 sketch-kit will create a `build/` folder containing a static build of the project.
+
+
+### Global Options
+
+_configFile_
+
+Define an alternative config file for different distributions.
+
+`sketch-kit run --configFile alt.config.json`
+
+The base sketch-kit.config.json defines the sketches which are visible while running sketch-kit, and provides a target for adding new sketches.
