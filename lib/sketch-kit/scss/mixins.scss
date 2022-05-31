@@ -2,7 +2,7 @@
 @mixin scroll-styles{
 
   &::-webkit-scrollbar {
-    width: 11px;
+    width: 5px;
   }
 
   & {
@@ -12,12 +12,13 @@
 
   &::-webkit-scrollbar-track {
     background: var(--scrollbarBG);
+    width:6px;
+    padding: 10px 0;
   }
 
   &::-webkit-scrollbar-thumb {
-    background-color: var(--thumbBG);
-    border-radius: 6px;
-    border: 3px solid var(--scrollbarBG);
+    background-color: #4d4d4d;
+    border-radius: 3px;
   }
 
 }

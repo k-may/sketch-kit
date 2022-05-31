@@ -7,8 +7,7 @@ const SketchKit = require('./app/sketch-kit');
 function main() {
     var argv = minimist(process.argv.slice(2), {string: ['configFile']});
 
-    console.log(argv)
-    var action = argv._.pop();
+    var action = argv._.shift();
     var args = argv._;
     var context = {
         configFile: argv.configFile
@@ -18,9 +17,6 @@ function main() {
         debug: false,
         ... context
     });
-
-
-    return;
 
     switch (action) {
         case 'create':
