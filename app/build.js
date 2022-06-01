@@ -13,7 +13,7 @@ module.exports = class Build {
 
     async start() {
 
-        utils.log('build');
+        utils.log('Build');
 
         const publicDir = path.resolve(process.cwd(), 'sketch-kit');
         const outDir = path.resolve(process.cwd(), 'sketch-kit/build');

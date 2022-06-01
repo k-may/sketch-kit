@@ -55,7 +55,7 @@ class Run {
             }
 
         }catch(e){
-            console.log(e);
+            utils.message("No certs found, defaulting to http")
         }
 
         const server = await createServer(config);
