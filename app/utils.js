@@ -11,7 +11,7 @@ const utils = {
         if (configFile !== utils.defaultConfigFile) {
             let configFilePath = path.join(publicDir, configFile)
             if (!fs.existsSync(configFilePath)) {
-                utils.log(`Config file ${configFilePath} not found, using default`);
+                utils.message(`Config file ${configFilePath} not found, using default`);
                 configFile = utils.defaultConfigFile;
             }else {
                 return configFile;
@@ -30,7 +30,7 @@ const utils = {
             }
         }
 
-        utils.log(`Using config file ${configFile}`);
+        utils.message(`Using config file ${configFile}`);
 
         return configFile;
     },
@@ -72,7 +72,11 @@ const utils = {
     },
 
     log: function (msg) {
-        console.log('\n\x1b[33mSKETCH-KIT -> \x1b[1m %s \x1b[0m', msg);
+        console.log('\n\x1b[33mSK ::\x1b[1m %s \x1b[0m', msg);
+    },
+
+    message: function(msg){
+        console.log('\x1b[33mSK :: %s \x1b[0m', msg);
     }
 }
 
