@@ -1,4 +1,8 @@
+
+# sketch-kit
 ![alt text](sketch-kit.png "Logo Title Text 1")
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fk-may%2Fsketch-kit.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fk-may%2Fsketch-kit?ref=badge_shield)
 
 [![npm version](https://badge.fury.io/js/sketch-kit.svg)](https://badge.fury.io/js/sketch-kit)
 
@@ -118,4 +122,9 @@ Define an alternative config file for different distributions.
 
 `sketch-kit run --configFile alt.config.json`
 
+If the sketch already exists, you'll be prompted to copy or replace, creating a new nested iteration.
+
 The base sketch-kit.config.json defines the sketches which are visible while running sketch-kit, and provides a target for adding new sketches.
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fk-may%2Fsketch-kit.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fk-may%2Fsketch-kit?ref=badge_large)
