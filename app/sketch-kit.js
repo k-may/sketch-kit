@@ -1,10 +1,10 @@
 var fs = require('fs-extra');
 var U = require('./update');
+const utils = require('./utils.js');
 
 class SketchKit {
 
     //TODO add clean task
-
 
     constructor(options) {
 
@@ -16,9 +16,17 @@ class SketchKit {
                 'dest': 'css/',
                 'entry': 'main.scss'
             },
+            'configFile' : options.configFile || utils.defaultConfigFile,
             'include_modules': true
         };
 
+        if (this._IsInitialized()) {
+            var configFile = options.configFile || utils.defaultConfigFile;
+            configFile = utils.getConfigFilePath(configFile);
+            this.config.configFile = configFile;
+        }else{
+            this.config.configFile = utils.defaultConfigFile;
+        }
     }
 
     //----------------------------------------------------
@@ -78,7 +86,7 @@ class SketchKit {
     /**
      * Runs gulp taks for project (sass, webpack, serve)
      */
-    run(args) {
+    run(args, context) {
         this.update().then(() => {
             var Run = require('./run');
             var run = new Run(this.config, args);
@@ -118,11 +126,13 @@ class SketchKit {
     _getConfig() {
         return new Promise((resolve, reject) => {
             if (this._IsInitialized()) {
-                fs.readFile('./sketch-kit/config.json', 'utf-8', (err, data) => {
 
-                    if (err)
+                fs.readFile("./sketch-kit/" + this.config.configFile, 'utf-8', (err, data) => {
+
+                    if (err) {
+                        console.log(err, configFile);
                         resolve(this.config)
-                    else {
+                    }else {
                         //merge global and local configs
                         this.config = {
                             ...this.config,

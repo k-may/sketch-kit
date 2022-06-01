@@ -6,30 +6,34 @@ const utils = require('./utils.js');
 
 module.exports = class Build {
 
-    constructor(config) {
+    constructor(config, args) {
+        this._args = args;
         this._config = config;
     }
 
-    async start(){
+    async start() {
 
-        utils.log("build");
+        utils.log('build');
 
         const publicDir = path.resolve(process.cwd(), 'sketch-kit');
         const outDir = path.resolve(process.cwd(), 'sketch-kit/build');
-        const includeDir =  path.resolve(publicDir, '/js')
+        const includeDir = path.resolve(publicDir, '/js')
 
         return build({
-            root : publicDir,
+            root: publicDir,
             publicDir,
-            build : {
+            build: {
                 outDir,
             },
-            plugins : [
+            plugins: [
                 glslify(),
                 dynamicImportVariables({
-                    include : includeDir,
+                    include: includeDir,
                 })
-            ]
+            ],
+            define : {
+                __configFile__ : `"${this._config.configFile}"`
+            }
         })
 
     }

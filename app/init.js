@@ -9,7 +9,7 @@ const FOLDER_NAME = 'sketch-kit';
 module.exports = class Main {
 
     constructor(config) {
-        this.config = config;
+        this._config = config;
     }
 
     run() {
@@ -26,7 +26,7 @@ module.exports = class Main {
     //----------------------------------------------------
 
     async _initialize() {
-        if (this.config.debug) {
+        if (this._config.debug) {
             return this._createApp({
                 'sketch': 'test'
             });
@@ -95,7 +95,7 @@ module.exports = class Main {
      */
     _updateGitignore() {
         if (fs.existsSync('.gitignore')) {
-            var vendorPath = path.join(this.config.root, 'js/vendor');
+            var vendorPath = path.join(this._config.root, 'js/vendor');
             var gIgnore = fs.readFileSync('./.gitignore', 'utf8');
             if (gIgnore.indexOf(vendorPath) == -1) {
                 gIgnore += '\n' + vendorPath;
@@ -124,7 +124,7 @@ module.exports = class Main {
 
     async _copyConfig({sketch, copyDependencies}) {
 
-        const {config, path} = await utils.loadConfig();//.then(({config, path}) => {
+        const {config, path} = await utils.loadConfig(this._config.configFile);//.then(({config, path}) => {
         //replace all sketch names throughout template
         replace({
             regex: '{project-name}',

@@ -1,45 +1,120 @@
+@import "mixins";
 @import "reset";
 @import "menu";
 @import "sketches/SketchKit.scss";
 
-:root{
+@font-face {
+  font-family: 'helveticaneuemedium';
+  src: url('./assets/fonts/helveticaneue_medium-webfont.woff2') format('woff2'),
+  url('./assets/fonts/helveticaneue_medium-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+
+}
+@font-face {
+  font-family: 'helveticaneuelight';
+  src: url('/assets/fonts/helveticaneue_light-webfont.woff2') format('woff2'),
+  url('/assets/fonts/helveticaneue_light-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+:root {
   font-size: 16px;
   @media (min-width: 900px) {
     font-size: 18px;
   }
-  --scrollbarBG: #CFD8DC;
-  --thumbBG: #90A4AE;
+  --scrollbarBG: rgba(27, 27, 27, 0);
+  --thumbBG: rgba(27, 27, 27, 0.4);
+}
+
+* {
+  font-family: 'helveticaneuemedium';
 }
 
 body {
   //overscroll-behavior-y: none;
   height: 100%;
-  margin:0;
-  padding:0;
+  margin: 0;
+  padding: 0;
+  overflow-x:hidden;
+
+  @include scroll-styles;
 }
 
-body::-webkit-scrollbar {
-  width: 11px;
-}
-body {
-  scrollbar-width: thin;
-  scrollbar-color: var(--thumbBG) var(--scrollbarBG);
-}
-body::-webkit-scrollbar-track {
-  background: var(--scrollbarBG);
-}
-body::-webkit-scrollbar-thumb {
-  background-color: var(--thumbBG) ;
-  border-radius: 6px;
-  border: 3px solid var(--scrollbarBG);
-}
+
 .expander {
   width: 1px;
   height: 200vh;
-  position:absolute;
-  top:0;
-  lefT:0;
+  position: absolute;
+  top: 0;
+  lefT: 0;
 }
+
+//SKETCH COMPASS CUBE
+
+
+.video {
+  position: absolute;
+  height: 100vh;
+  width: 120%;
+  z-index: -10;
+  top: 0;
+  left: 0;
+}
+
+.startButton {
+  position: absolute;
+  top: 5vh;
+  right: 5vw;
+  display: block;
+  z-index: 100;
+
+  &.hide {
+    display: none;
+  }
+}
+
+.dg {
+  margin: auto;
+}
+
+.overlay{
+  position:absolute;
+  width:100vw;
+  height:100vh;
+  z-index:1000;
+  pointer-events: none;
+  div{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height:100%;
+    position:absolute;
+    top:0;
+
+    svg {
+      margin:20px 20px;
+    }
+
+    &.left{
+
+      left:0;
+    }
+
+    &.right{
+      position:absolute;
+      right:0;
+    }
+  }
+
+  @media only screen and (max-width: 600px) {
+    div {
+      display: none;
+    }
+  }
+}
+
 
 //DON'T EDIT IMPORTS BELOW!
 //todo add 'code in' and 'code out' directives here

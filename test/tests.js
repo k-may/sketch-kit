@@ -17,42 +17,38 @@ before(() => {
 
 //========================================================
 
-//describe('SketchKit A : init', () => {
-    it('sketch-kit/ folder created', async () => {
+it('sketch-kit/ folder created', async () => {
 
-        //remove previous version
-        //await fs.removeSync(sketchesPath);
+    await fs.removeSync(sketchesPath);
 
-        await sketches.init()
-        var folderExist = await fs.existsSync(sketchesPath);
-        assert(folderExist, 'sketch-kit initialized');
+    await sketches.init()
+    var folderExist = await fs.existsSync(sketchesPath);
+    assert(folderExist, 'sketch-kit initialized');
 
-    });
-    it('sketch created', async  () =>{
+});
+it('sketch created', async () => {
 
-        await sketches.create(['test']);
+    await sketches.create(['test']);
 
-        var sketchPath = path.join(sketchesPath, '/js/sketches/test');
-        var folderExist = await fs.existsSync(sketchPath);
+    var sketchPath = path.join(sketchesPath, '/js/sketches/test');
+    var folderExist = await fs.existsSync(sketchPath);
 
-        assert(folderExist, 'sketch was created');
+    assert(folderExist, 'sketch was created');
 
-    });
-//})
+});
+it('sketch copied', async () => {
+
+    await sketches.create(['test', 'forceCopy']);
+
+    var sketchPath = path.join(sketchesPath, '/js/sketches/forceCopy');
+    var folderExist = await fs.existsSync(sketchPath);
+
+    assert(folderExist, `sketch was copied : ${sketchPath} / exists : ${folderExist}`);
+
+});
 
 after(() => {
     fs.removeSync(sketchesPath, {}, err => {
         console.log(err);
     })
 });
-
-//--------------------------------------------------------
-/*
-
-describe('SketchKit B : create', function () {
-
-
-
-    //remove previous version
-    //fs.removeSync(sketchesPath);
-});*/

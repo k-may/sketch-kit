@@ -9,8 +9,8 @@ class Create {
 
     constructor(config, args) {
 
-        this.config = config;
-        this.args = args;
+        this._config = config;
+        this._args = args;
         this.sketchName = args.length ? args[0] : '';
 
     }
@@ -49,7 +49,10 @@ class Create {
         this.author = author;
 
         if (this.sketchConfig.sketches.hasOwnProperty(name)) {
-            this._seeReplaceOrCopy();
+            if(process.env.TEST)
+               return this._copySketch(this.sketchName, this.author)
+            else
+               this._seeReplaceOrCopy();
         } else if (name === '') {
             console.log('Name not valid');
             return this._prompt();
@@ -84,7 +87,7 @@ class Create {
         var origSassPath = path.join(process.cwd(), 'sketch-kit/scss/sketches/_' + name + '.scss');
 
         //if new name, will create a new tree
-        var newName = this.args.length > 1 ? this.args[1] : this._seeSketchTreeName(name);
+        var newName = this._args.length > 1 ? this._args[1] : this._seeSketchTreeName(name);
 
         try {
             await this._createScript(newName, origSketchPath, name, true);
@@ -170,8 +173,6 @@ class Create {
         }
 
         var sassPath = './sketch-kit/scss/sketches/_' + name + '.scss';
-
-        console.log({name, templatePath, replaceName, sassPath});
 
         //copy and rename
         await fs.copy(templatePath, sassPath);
@@ -297,7 +298,7 @@ class Create {
             try {
                 this.sketchConfig = fs.readJSONSync(sketchConfigPath);
             } catch (e) {
-                this.config.legacy = true;
+                this._config.legacy = true;
                 sketchConfigPath = this._getConfigPath();
                 this.sketchConfig = fs.readJSONSync(sketchConfigPath);
             }
@@ -308,10 +309,10 @@ class Create {
     }
 
     _getConfigPath() {
-        if (this.config.legacy)
-            return this.config.root + '/data/config.json';
+        if (this._config.legacy)
+            return this._config.root + '/data/config.json';
 
-        return this.config.root + '/config.json';
+        return path.resolve(this._config.root, this._config.configFile);
     }
 }
 
