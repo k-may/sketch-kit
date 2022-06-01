@@ -20,7 +20,8 @@ Sketch-Kit is designed to live along-side your project (a sketch-kit/ folder wil
 - [glslify](https://github.com/glslify/glslify)
 - sass
 
-![alt text](design/Screenshot 2022-06-01 113728.png "Screen Grab")
+![alt text](https://github.com/k-may/sketch-kit/raw/master/design/Screenshot%202022-06-01%20113728.png "Screen Grab")
+
 ## Setup
 
 Each '_sketch_' gets a javascript file and scss file generated on creation.
