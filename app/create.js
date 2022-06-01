@@ -3,25 +3,27 @@ var fs = require('fs-extra');
 var os = require('os');
 var path = require('path');
 var replace = require('replace');
+var utils = require('./utils.js');
 
 class Create {
 
     constructor(config, args) {
 
-        this.config = config;
-        this.args = args;
+        this._config = config;
+        this._args = args;
         this.sketchName = args.length ? args[0] : '';
 
     }
 
-    start() {
-        this._getConfig().then(config => {
-            if (this.sketchName) {
-                //return this._createSketch(this.sketchName, os.userInfo().username);
-                return this._tryCreateSketch(this.sketchName, os.userInfo().username);
-            } else
-                return this._prompt();
-        });
+    async start() {
+
+        utils.log("Create");
+
+        var config = await this._getConfig();
+        if (this.sketchName) {
+            await this._tryCreateSketch(this.sketchName, os.userInfo().username);
+        } else
+            await this._prompt();
     }
 
     //----------------------------------------------------
@@ -41,18 +43,21 @@ class Create {
         });
     }
 
-    _tryCreateSketch(name, author) {
+    async _tryCreateSketch(name, author) {
 
         this.sketchName = name;
         this.author = author;
 
         if (this.sketchConfig.sketches.hasOwnProperty(name)) {
-            this._seeReplaceOrCopy();
+            if(process.env.TEST)
+               return this._copySketch(this.sketchName, this.author)
+            else
+               this._seeReplaceOrCopy();
         } else if (name === '') {
             console.log('Name not valid');
             return this._prompt();
         } else {
-            return this._createSketch(name, author);
+            await this._createSketch(name, author);
         }
 
     }
@@ -60,7 +65,7 @@ class Create {
     _seeReplaceOrCopy() {
         inquirer.prompt({
             'type': 'list',
-            'message': 'Sketch already exists, would like to replace it or copy it',
+            'message': '\x1b[33mSketch already exists, would you like to replace it or copy it?',
             'name': 'replace',
             'choices': ['copy', 'replace', 'niether']
         }).then(result => {
@@ -76,39 +81,22 @@ class Create {
         });
     }
 
-    _copySketch(name, author) {
+    async _copySketch(name, author) {
 
-        var origSketchPath = path.join(process.cwd(), 'sketch-kit/js/views/sketches/', name);
+        var origSketchPath = path.join(process.cwd(), 'sketch-kit/js/sketches/', name + '/' + name + '.js');
+        var origSassPath = path.join(process.cwd(), 'sketch-kit/scss/sketches/_' + name + '.scss');
 
-        var newName = this.args.length > 1 ? this.args[1] : name
-        newName = this._getSketchNameVersioned(newName);
-        var newSketchPath = './sketch-kit/js/views/sketches/' + newName;
+        //if new name, will create a new tree
+        var newName = this._args.length > 1 ? this._args[1] : this._seeSketchTreeName(name);
 
-        return new Promise((resolve, reject) => {
-
-            //copy original
-            fs.copy(origSketchPath, newSketchPath).then(() => {
-
-                //rename js
-                var origFileName = path.join(newSketchPath, name + '.js');
-                var newFileName = path.join(newSketchPath, newName + '.js');
-
-                fs.rename(origFileName, newFileName).then(() => {
-
-                    var sassPath = path.join(process.cwd(), 'sketch-kit/scss/sketches/_' + name + '.scss');
-                    var newSassPath = path.join(process.cwd(), 'sketch-kit/scss/sketches/_' + newName + '.scss');
-
-                    fs.copy(sassPath, newSassPath).then(async () => {
-
-                        await this._writeSketch(newName, author, newSketchPath, newSassPath, name);
-
-                        resolve();
-                    });
-                });
-            });
-        });
+        try {
+            await this._createScript(newName, origSketchPath, name, true);
+            await this._createSass(newName, origSassPath, name);
+            await this._addSketchToTree(newName, author);
+        } catch (e) {
+            console.log('copySketch error : ' + e.message);
+        }
     }
-
 
     /***
      * Copies sketch template to Sketch-Kit project and updates
@@ -118,38 +106,23 @@ class Create {
      * @param author
      * @private
      */
-    _createSketch(name, author) {
+    async _createSketch(name, author) {
 
         //cleanup names
         name = name.replace('-', '');
 
-        var sketchKitPath = './sketch-kit/js/views/sketches/' + name;
-        var sassPath = './sketch-kit/scss/sketches';
+        var sketchKitPath = './sketch-kit/js/sketches/' + name;
 
-        return new Promise((resolve, reject) => {
-            return this._createScript(name)
-                .then(this._createSass(name))
-                .then(async () => {
-
-                    await this._writeSketch(name, author, sketchKitPath, sassPath);
-
-                    resolve();
-                });
-        });
+        try {
+            await this._createScript(name);
+            await this._createSass(name);
+            await this._addSketchToTree(name, author);
+        } catch (e) {
+            console.log('createSketch error : ' + e.message);
+        }
     }
 
-    async _writeSketch(name, author, jsPath, sassPath, nameReplace) {
-
-        nameReplace = nameReplace || '{sketchname}';
-
-        //replace all sketchnames throughout templates
-        replace({
-            regex: nameReplace,
-            replacement: name,
-            paths: [jsPath, sassPath],
-            recursive: true,
-            silent: true,
-        });
+    async _addSketchToTree(name, author) {
 
         //add new sketch config to sketch-kit/data/config.json
         this.sketchConfig.sketches[name] = {
@@ -157,128 +130,161 @@ class Create {
             'author': author
         };
 
-        this._seeConfigRelations();
-
+        this._seeConfigSketchTree();
         var sketchConfigPath = this._getConfigPath();
-        await fs.writeFileSync(sketchConfigPath, JSON.stringify(this.sketchConfig, null, 4));
-
+        await fs.writeFile(sketchConfigPath, JSON.stringify(this.sketchConfig, null, 4));
     }
 
-    _createScript(name) {
-        return new Promise((resolve, reject) => {
-            var templatePath = path.resolve(__dirname, '../');
+    async _createScript(name, templatePath, replaceName, copyDeps) {
+
+        if (!templatePath) {
+            templatePath = path.resolve(__dirname, '../');
             templatePath = path.join(templatePath, '/lib/templates/script.txt');
-            var sketchKitPath = './sketch-kit/js/views/sketches/' + name + '/' + name + '.js';
-            //copy and rename
-            fs.copy(templatePath, sketchKitPath).then(() => {
-                resolve();
+        }
+
+        var sketchFolder = './sketch-kit/js/sketches/' + name + '/';
+        var sketchKitPath = sketchFolder + name + '.js';
+        await fs.copy(templatePath, sketchKitPath);
+
+        //replace all sketchnames throughout templates
+        replaceName = replaceName || '{sketchname}';
+
+        utils.replaceNameInFile(replaceName, name, sketchKitPath);
+
+        //copy deps
+        if(copyDeps) {
+            const templateFileName = path.basename(templatePath);
+            const templateDirName = path.dirname(templatePath);
+            const files = await fs.promises.readdir(templateDirName);
+            files.forEach(async (file) => {
+                if (file !== templateFileName) {
+                    await fs.copy(path.join(templateDirName, file), sketchFolder + file);
+                }
             });
-        });
+        }
     }
 
-    _createSass(name) {
-        return new Promise((resolve, reject) => {
-            var templatePath = path.resolve(__dirname, '../');
+    async _createSass(name, templatePath, replaceName) {
+
+
+        if (!templatePath) {
+            templatePath = path.resolve(__dirname, '../');
             templatePath = path.join(templatePath, '/lib/templates/sass.txt');
-            var sassPath = './sketch-kit/scss/sketches/_' + name + '.scss';
-            //copy and rename
-            fs.copy(templatePath, sassPath).then(() => {
+        }
+
+        var sassPath = './sketch-kit/scss/sketches/_' + name + '.scss';
+
+        //copy and rename
+        await fs.copy(templatePath, sassPath);
+
+        //replace all sketchnames throughout templates
+        replaceName = replaceName || '{sketchname}';
+        utils.replaceNameInFile(replaceName, name, sassPath);
+
+        //append import to entry point..
+        var sassEntryPath = './sketch-kit/scss/main.scss';
+        return new Promise((resolve => {
+            fs.readFile(sassEntryPath, 'utf8', (err, data) => {
+                if (err) {
+                    console.log(err.message);
+                    throw err;
+                }
+                data += `\n@import "sketches/${name}";`
+                fs.writeFile(sassEntryPath, data);
                 resolve();
             });
-        });
+        }))
+
     }
 
-    _getSassTemplate(name) {
-        return new Promise(resolve => {
-            var templatePath = path.resolve(__dirname, '../');
-            templatePath = path.join(templatePath, '/lib/templates/script.txt');
-            fs.readFile(templatePath, 'utf8', (err, txt) => {
-                if (err) console.error(err.message);
-                resolve(txt);
-            });
-        });
-    }
+    _seeConfigSketchTree() {
 
-    _seeConfigRelations() {
-
-        var sketches = this.sketchConfig.sketches;
-
-        for (var name in sketches) {
-
+        const {sketches} = this.sketchConfig;
+        for (var current in sketches) {
             var children = [];
-            var lastIndex = name.lastIndexOf('_');
-            var version = name.substring(lastIndex);
 
             for (var child in sketches) {
+                if (current !== child && child.indexOf(current) == 0) {
+                    //see if child branches directly from current
+                    let childDepth = this._getDepth(child);
+                    //step one branch back...
+                    childDepth.pop();
 
-                if (name != child) {
+                    const parentDepth = this._getDepth(current);
 
-                    //check root
-                    if (child.indexOf(name) == 0) {
-
-                        //check root version
-                        var parentVersion = this._versionRoot(child);
-                        if (parentVersion == version) {
-                            children.push(child);
-                        }
-
+                    if (JSON.stringify(childDepth) === JSON.stringify(parentDepth)) {
+                        children.push(child);
                     }
-
                 }
-
             }
 
             if (children.length) {
                 children.sort();
-                sketches[name].children = children;
+                sketches[current].children = children;
             }
         }
 
     }
 
-    _version(name) {
+    _seeTreeDepth(name) {
         var lastIndex = name.lastIndexOf('_');
         return name.substring(lastIndex);
     }
 
-    _versionRoot(name) {
+    /**
+     * Converts branching syntax to multidimensional array
+     * @param name
+     * @return {string[]}
+     * @private
+     */
+    _getDepth(name) {
+        const index = (name.indexOf('_'))
+        if (index > -1) {
+            const substring = index > -1 ? name.substring(index) : index;
+            const depth = substring.replace(/_/g, '').split('').map(num => parseInt(num))
+            return depth;
+        } else {
+            //initial sketch....
+            return [];
+        }
+    }
+
+    _seeRoot(name) {
         var lastIndex = name.lastIndexOf('_');
         name = name.substring(0, lastIndex);
         return name.substring(name.indexOf('_'));
     }
 
-    _getSketchNameVersioned(parent) {
+    _seeSketchTreeName(current) {
 
-        var sketches = this.sketchConfig.sketches;
-        var parentVersion = this._version(parent);
+        const {sketches} = this.sketchConfig;
+
+        var parentVersion = this._getDepth(current)
 
         var children = [];
         for (var name in sketches) {
 
-            if (parent != name) {
-                //check root
-                if (name.indexOf(parent) == 0) {
-                    //check version root
-                    var versionRoot = this._versionRoot(name);
-                    if (versionRoot == parentVersion)
-                        children.push(name);
+            if (current != name && name.indexOf(current) == 0) {
+                //check version root
+                var versionRoot = this._getDepth(name)
+                versionRoot.pop()
+                if (JSON.stringify(versionRoot) == JSON.stringify(parentVersion)) {
+                    children.push(name);
                 }
             }
         }
 
-        return parent + '_' + (children.length + 1);
-
+        return current + '_' + (children.length + 1);
     }
 
     _getPromptConfig() {
-
         return [{
             'type': 'input',
-            'message': 'Sketch name',
+            'message': '\x1b[33mSketch name',
             'name': 'sketch'
         }, {
             'type': 'input',
-            'message': 'Author',
+            'message': '\x1b[33mAuthor',
             'name': 'author',
             'default': os.userInfo().username
         }];
@@ -292,7 +298,7 @@ class Create {
             try {
                 this.sketchConfig = fs.readJSONSync(sketchConfigPath);
             } catch (e) {
-                this.config.legacy = true;
+                this._config.legacy = true;
                 sketchConfigPath = this._getConfigPath();
                 this.sketchConfig = fs.readJSONSync(sketchConfigPath);
             }
@@ -303,10 +309,10 @@ class Create {
     }
 
     _getConfigPath() {
-        if (this.config.legacy)
-            return this.config.root + '/data/config.json';
+        if (this._config.legacy)
+            return this._config.root + '/data/config.json';
 
-        return this.config.root + '/config.json';
+        return path.resolve(this._config.root, this._config.configFile);
     }
 }
 

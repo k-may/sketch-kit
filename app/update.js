@@ -1,5 +1,6 @@
 var fs = require('fs-extra');
 var copyNodeModules = require('copy-node-modules');
+const utils = require('./utils.js');
 
 class Update {
 
@@ -8,6 +9,9 @@ class Update {
     }
 
     start() {
+
+        utils.log("Update");
+
         return this._copyDependencies();
     }
 
@@ -17,9 +21,9 @@ class Update {
 
         return new Promise(resolve => {
 
-            if(!this.config.include_modules || process.env.TEST) {
+            if (!this.config.copyDependencies || process.env.TEST) {
                 resolve();
-            }else {
+            } else {
 
                 var pkg = fs.readFileSync('./package.json');
                 if (pkg) {
@@ -31,15 +35,15 @@ class Update {
                     }
                 }
 
-                var srcDir = "./";
-                var dstDir = "sketch-kit/js";
+                var srcDir = './';
+                var dstDir = 'sketch-kit/js';
 
-                fs.remove("sketch-kit/js/node_modules", () => {
+                fs.remove('sketch-kit/js/node_modules', () => {
 
                     copyNodeModules(srcDir, dstDir, {devDependencies: false}, function (err, results) {
                         if (err) {
-                            console.error(err);
-                            return;
+                            console.warn(err);
+                            resolve();
                         }
                         for (var i in results) {
                             console.log('package name:' + results[i].name + ' version:' + results[i].version);

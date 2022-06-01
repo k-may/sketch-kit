@@ -1,37 +1,69 @@
-var gulp = require('gulp');
 var path = require('path');
-var plugins = require('gulp-load-plugins')();
 var fs = require('fs');
+
+const {createServer, defineConfig} = require('vite');
+const {glslify} = require('vite-plugin-glslify');
+const utils = require('./utils.js');
 
 class Run {
 
     constructor(config, args) {
+        this._args = args;
+        this._config = config;
+    }
 
-        this._tasksConfig = config;
-        this.args = args;
+    async start() {
+
+        utils.log("Run");
+
+        const publicDir = path.resolve(process.cwd(), 'sketch-kit');
+
+        const config = {
+            // any valid user config options, plus `mode` and `configFile`
+            root: publicDir,
+            mode: 'development',
+            server: {
+                port: 3002,
+                host: true,
+                hmr: true
+            },
+            plugins: [
+                glslify()
+            ],
+            define : {
+                __configFile__ : `"${this._config.configFile}"`
+            }
+        }
+
+
+        try {
+            //try to load cert files..
+            //todo add to documentation
+
+            let filePath = path.resolve(process.cwd(), '.cert/key.pem');
+            const keyFile = fs.readFileSync(filePath);
+
+            filePath = path.resolve(process.cwd(), '.cert/cert.pem');
+            const certFile = fs.readFileSync(filePath);
+
+
+            if (keyFile && certFile) {
+                config.server.https = {
+                    key: keyFile,
+                    cert: certFile
+                }
+            }
+
+        }catch(e){
+            utils.message("No certs found, defaulting to http")
+        }
+
+        const server = await createServer(config);
+        await server.listen()
 
     }
 
-    start() {
-
-        //browser-sync
-        var taskPath = path.resolve(__dirname, '../tools/build/sass');
-        const scripts = require(taskPath)(gulp, plugins, this._tasksConfig);
-        var sketchKitPath = path.resolve(process.cwd(), 'sketch-kit/');
-        var scssPath = sketchKitPath + '/' + this._tasksConfig.sass.src;
-
-        this.watch(scssPath, scripts);
-        scripts();
-
-        //sass
-        taskPath = path.resolve(__dirname, '../tools/build/serve');
-
-        const serve = require(taskPath)(this._tasksConfig);
-        serve();
-
-    }
-
-    watch(path, cb){
+    watch(path, cb) {
         var tmeOut;
         fs.watch(path, {recursive: true}, () => {
             if (!tmeOut) {

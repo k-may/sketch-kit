@@ -1,5 +1,6 @@
 var fs = require('fs-extra');
 var U = require('./update');
+const utils = require('./utils.js');
 
 class SketchKit {
 
@@ -15,10 +16,17 @@ class SketchKit {
                 'dest': 'css/',
                 'entry': 'main.scss'
             },
+            'configFile' : options.configFile || utils.defaultConfigFile,
             'include_modules': true
         };
 
-
+        if (this._IsInitialized()) {
+            var configFile = options.configFile || utils.defaultConfigFile;
+            configFile = utils.getConfigFilePath(configFile);
+            this.config.configFile = configFile;
+        }else{
+            this.config.configFile = utils.defaultConfigFile;
+        }
     }
 
     //----------------------------------------------------
@@ -26,9 +34,10 @@ class SketchKit {
     /**
      * Prompts for info and appends new sketch to sketches
      */
-    create(args) {
+    async create(args) {
 
-        return this.update().then(() => {
+        try {
+            await this.update()
             if (this._IsInitialized()) {
                 var Create = require('./create');
                 var create = new Create(this.config, args);
@@ -36,9 +45,9 @@ class SketchKit {
             } else {
                 throw new Error('Sketch-Kit not initialized!\nPlease run \'test init\' first.');
             }
-        }).catch(e => {
+        } catch (e) {
             console.log(e);
-        });
+        }
     }
 
     /**
@@ -77,7 +86,7 @@ class SketchKit {
     /**
      * Runs gulp taks for project (sass, webpack, serve)
      */
-    run(args) {
+    run(args, context) {
         this.update().then(() => {
             var Run = require('./run');
             var run = new Run(this.config, args);
@@ -85,6 +94,16 @@ class SketchKit {
         }).catch((e) => {
             console.log('Run error : ' + e);
         });
+    }
+
+    build(args) {
+        this.update().then(() => {
+            var Build = require('./build');
+            var build = new Build(this.config, args);
+            return build.start();
+        }).catch(e => {
+            console.log('Build error : ' + e);
+        })
     }
 
     //-----------------------------------------------------
@@ -107,11 +126,13 @@ class SketchKit {
     _getConfig() {
         return new Promise((resolve, reject) => {
             if (this._IsInitialized()) {
-                fs.readFile('./sketch-kit/config.json', 'utf-8', (err, data) => {
 
-                    if (err)
+                fs.readFile("./sketch-kit/" + this.config.configFile, 'utf-8', (err, data) => {
+
+                    if (err) {
+                        console.log(err, configFile);
                         resolve(this.config)
-                    else {
+                    }else {
                         //merge global and local configs
                         this.config = {
                             ...this.config,

@@ -1,18 +1,21 @@
 var fs = require('fs-extra');
 var path = require('path');
 var inquirer = require('inquirer');
-var replace = require("replace");
+var replace = require('replace');
 var utils = require('./utils.js');
 
-const FOLDER_NAME = "sketch-kit";
+const FOLDER_NAME = 'sketch-kit';
 
 module.exports = class Main {
 
     constructor(config) {
-        this.config = config;
+        this._config = config;
     }
 
     run() {
+
+        utils.log("Init");
+
         if (this._IsInitialized()) {
             throw new Error('Sketch-Kit already initialized');
         } else {
@@ -22,16 +25,15 @@ module.exports = class Main {
 
     //----------------------------------------------------
 
-    _initialize() {
-        if (this.config.debug) {
+    async _initialize() {
+        if (this._config.debug) {
             return this._createApp({
-                "sketch": "test"
+                'sketch': 'test'
             });
         }
 
-        return this._prompt().then(result => {
-            return this._createApp(result);
-        });
+        var result = await this._prompt()
+        return this._createApp(result);
 
     }
 
@@ -41,27 +43,12 @@ module.exports = class Main {
      * @returns {Promise<null>}
      * @private
      */
-    _createApp(result) {
+    async _createApp(result) {
 
-        var projectName = result.sketch;
-        return this._copyApp().then(() => {
+        await this._copyApp();
+        await this._copyConfig(result);
+        await this._updateIgnore();
 
-            utils.loadConfig().then( ({ config, path }) =>{
-                //replace all sketch names throughout template
-                replace({
-                    regex: "{project-name}",
-                    replacement: projectName,
-                    paths: ["./sketch-kit/"],
-                    recursive: true,
-                    silent: true,
-                });
-
-                config.project = projectName;
-
-                return fs.writeFile(path, JSON.stringify(config, null, 4));
-
-            });
-        });
     }
 
     _prompt() {
@@ -86,9 +73,18 @@ module.exports = class Main {
         var defaultName = path.basename(path.dirname(process.cwd()));
         return [{
             'type': 'input',
-            'message': 'Project name',
+            'message': '\x1b[33mProject name',
             'name': 'sketch',
             'default': defaultName
+        }, {
+            'type': 'input',
+            'message': '\x1b[33mWould you like to include node dependencies?',
+            'name': 'copyDependencies',
+            'choices': ['yes', 'no'],
+            'default': 'yes',
+            validate: answer => {
+                return answer === 'yes' || answer === 'no'
+            }
         }];
 
     }
@@ -99,7 +95,7 @@ module.exports = class Main {
      */
     _updateGitignore() {
         if (fs.existsSync('.gitignore')) {
-            var vendorPath = path.join(this.config.root, 'js/vendor');
+            var vendorPath = path.join(this._config.root, 'js/vendor');
             var gIgnore = fs.readFileSync('./.gitignore', 'utf8');
             if (gIgnore.indexOf(vendorPath) == -1) {
                 gIgnore += '\n' + vendorPath;
@@ -124,6 +120,44 @@ module.exports = class Main {
 
         });
 
+    }
+
+    async _copyConfig({sketch, copyDependencies}) {
+
+        const {config, path} = await utils.loadConfig(this._config.configFile);//.then(({config, path}) => {
+        //replace all sketch names throughout template
+        replace({
+            regex: '{project-name}',
+            replacement: sketch,
+            paths: ['./sketch-kit/'],
+            recursive: true,
+            silent: true,
+        });
+
+        config.project = sketch;
+        config.copyDependencies = copyDependencies === 'yes';
+
+        await fs.writeFile(path, JSON.stringify(config, null, 4));
+
+    }
+
+    /**
+     * Make sure copied node modules aren't included in the repo..
+     *
+     * @return {Promise<unknown>}
+     * @private
+     */
+    async _updateIgnore() {
+
+        const ignorePath = path.join(process.cwd(), '.gitignore');
+        return new Promise(resolve => {
+            fs.appendFile(ignorePath, '/sketch-kit/js/node_modules/', function (err) {
+                if (err)
+                    console.log(err.message);
+
+                resolve();
+            });
+        })
     }
 
 };

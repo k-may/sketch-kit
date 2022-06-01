@@ -1,55 +1,203 @@
+@import "mixins";
+
+$green: #3A6361;
+$pink: #E8ACC8;
+$blue: #36588A;
+$yellow: #BC9249;
+$grey: #83838E;
+$maroon: #7A3C45;
+$ochre: #B86455;
+$beige: #AE867D;
+$grey-bg: #4d4d4d;
+
 .menu {
 
   position: fixed;
   z-index: 1000;
+  margin: 20px;
 
-  ul {
-    position: absolute;
-    top: 0;
-    z-index: 200;
-    font-size: 13px;
-    padding-left: 20px;
-
-    button {
-      margin: 4px 0;
-      width: 22px;
-      height: 22px;
-      background-color: rgba(238, 238, 238, 0.7);
-      border: none;
-      border-radius: 0;
-    }
-
-    li {
-      white-space: nowrap;
-      display: none;
-      width: auto;
-      margin: 4px 0;
-      list-style-type: none;
-      background: rgba(27, 27, 27, 0.49);
-      cursor: pointer;
-      padding: 3px 14px;
-      color: #fff;
-
-      &.active {
-        background: rgba(228, 228, 228, 0.72);
-      }
-
-      &:hover {
-        background: rgba(238, 238, 238, 0.7);
-      }
-
-    }
-
+  button {
+    margin: 0;
+    width: 1rem;
+    height: 1rem;
+    background-color: rgba(238, 238, 238, 1);
+    border: none;
+    border-radius: 50%;
+    outline: none;
+    text-decoration: none;
+    cursor: pointer;
+    pointer-events: none;
+    opacity : 1;
+    transition: opacity 200ms;
   }
 
   &:hover {
     button {
-      display: none;
+      opacity : 0;
     }
 
-    li {
-      display: block;
+    > div {
+      opacity: 1;
+      clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)
     }
+  }
+
+  > div {
+    //display: none;
+    position: absolute;
+    top: 0;
+    padding: 10px 8px;
+    border-radius: 12px;
+    opacity: 0;
+    background-color: rgba(77, 77, 77, 0.2);
+    transition: clip-path 200ms ease-out, opacity 200ms;
+    clip-path: polygon(0% 0%, 10px 0%, 10px 10px, 0% 10px);
+
+    > ul {
+      padding: 2px 8px 2px 0;
+      z-index: 200;
+      max-height: 80vh;
+      min-width: 300px;
+      overflow-y: scroll;
+
+      @include scroll-styles;
+
+      > li:first-of-type {
+        margin-top: 0;
+      }
+
+      > li:last-of-type {
+        margin-bottom: 0;
+      }
+
+      li {
+        font-family: "Major Mono Display";
+        font-size: 1rem;
+        white-space: nowrap;
+        width: auto;
+        margin: 8px 0;
+        background: rgba(77, 77, 77, 0.4);
+        border-radius: 12px;
+        cursor: pointer;
+        padding: 3px;
+        color: #fff;
+
+        &.active, &:hover {
+          background: rgba(255, 255, 255, 0.6);
+          color: #2b2b2b;
+          outline: 1px rgba(77, 77, 77, 0.3) solid;
+        }
+
+        &:active {
+          background: rgba(213, 213, 213, 0.7);
+        }
+
+        > ul {
+          padding: 0 3px 3px 1rem;
+        }
+
+        .sketch {
+
+          font-size: 14px;
+          line-height: 14px;
+          padding: 6px 1em;
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          justify-content: space-between;
+
+          .tags_container {
+            display: inline-flex;
+            flex-direction: row;
+            height: 1rem;
+
+            .tag {
+
+              margin: 0 6px;
+              height: 100%;
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+              position: relative;
+
+              &:before {
+                content: "";
+                display: inline-block;
+                width: 6px;
+                height: 6px;
+                border-radius: 50%;
+              }
+
+              > span {
+                background: rgba(255, 255, 255, 0.7);
+                color: #000;
+                padding: 1px 6px 1px 4px;
+                font-size: 10px;
+                border-top-right-radius: 6px;
+                border-bottom-right-radius: 6px;
+                display: none;
+              }
+
+              &:hover {
+                > span {
+                  display: inline-block;
+                }
+
+                &:before {
+                  opacity: 0;
+                }
+              }
+
+              @mixin tagColor($color) {
+                &:before {
+                  background-color: $color;
+                }
+                > span {
+                  outline: 1px $color solid;
+                }
+              }
+
+              &.green {
+                @include tagColor($green);
+              }
+
+              &.pink {
+                @include tagColor($pink);
+              }
+
+              &.blue {
+                @include tagColor($blue);
+              }
+
+              &.yellow {
+                @include tagColor($yellow);
+              }
+
+              &.grey {
+                @include tagColor($grey);
+              }
+
+              &.maroon {
+                @include tagColor($maroon);
+              }
+
+              &.ochre {
+                @include tagColor($ochre);
+              }
+
+              &.beige {
+                @include tagColor($beige);
+              }
+            }
+          }
+
+        }
+
+
+      }
+
+    }
+
   }
 
 }
