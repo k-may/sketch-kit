@@ -3,22 +3,6 @@
 @import "menu";
 @import "sketches/SketchKit.scss";
 
-@font-face {
-  font-family: 'helveticaneuemedium';
-  src: url('./assets/fonts/helveticaneue_medium-webfont.woff2') format('woff2'),
-  url('./assets/fonts/helveticaneue_medium-webfont.woff') format('woff');
-  font-weight: normal;
-  font-style: normal;
-
-}
-@font-face {
-  font-family: 'helveticaneuelight';
-  src: url('/assets/fonts/helveticaneue_light-webfont.woff2') format('woff2'),
-  url('/assets/fonts/helveticaneue_light-webfont.woff') format('woff');
-  font-weight: normal;
-  font-style: normal;
-}
-
 :root {
   font-size: 16px;
   @media (min-width: 900px) {
