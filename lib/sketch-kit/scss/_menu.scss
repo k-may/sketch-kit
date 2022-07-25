@@ -19,17 +19,25 @@ $grey-bg: #4d4d4d;
 
   button {
     margin: 0;
-    width: 1rem;
-    height: 1rem;
-    background-color: rgba(238, 238, 238, 1);
+    width: 2rem;
+    height: 2rem;
+    background-color: var(--thumbBG);
     border: none;
     border-radius: 50%;
     outline: none;
     text-decoration: none;
     cursor: pointer;
-    pointer-events: all;
+    pointer-events: none;
     opacity : 1;
     transition: opacity 200ms;
+    padding: 9px;
+    &:after{
+      content : "sk";
+      color: $pink;
+      position:absolute;
+      transform: translate(-50%,-50%);
+      font-family: "Major Mono Display";
+    }
   }
 
   &:hover {

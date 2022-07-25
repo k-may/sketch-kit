@@ -26,10 +26,7 @@ module.exports = class Build {
                 outDir,
             },
             plugins: [
-                glslify(),
-                dynamicImportVariables({
-                    include: includeDir,
-                })
+                glslify()
             ],
             define : {
                 __configFile__ : `"${this._config.configFile}"`
