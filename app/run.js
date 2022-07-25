@@ -31,7 +31,8 @@ class Run {
                 glslify()
             ],
             define : {
-                __configFile__ : `"${this._config.configFile}"`
+                __configFile__ : `"${this._config.configFile}"`,
+                __version__ : `"${this._config.version}"`
             }
         }
 
