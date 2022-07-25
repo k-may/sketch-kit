@@ -1,6 +1,7 @@
 var fs = require('fs-extra');
 var U = require('./update');
 const utils = require('./utils.js');
+const {version} = require('../package.json');
 
 class SketchKit {
 
@@ -17,7 +18,8 @@ class SketchKit {
                 'entry': 'main.scss'
             },
             'configFile' : options.configFile || utils.defaultConfigFile,
-            'include_modules': true
+            'include_modules': true,
+            'version' : 'v' + version
         };
 
         if (this._IsInitialized()) {
