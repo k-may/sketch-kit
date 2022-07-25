@@ -136,6 +136,7 @@ module.exports = class Main {
 
         config.project = sketch;
         config.copyDependencies = copyDependencies === 'yes';
+        config.version = this._config.version;
 
         await fs.writeFile(path, JSON.stringify(config, null, 4));
 
