@@ -31,6 +31,9 @@ function main() {
         case 'build':
             s.build(args);
             break;
+        case 'preview':
+            s.preview(args);
+            break;
         default :
             console.log('No Command, will update')
             s.update(args);

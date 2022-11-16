@@ -2,7 +2,6 @@ var path = require('path');
 var fs = require('fs');
 
 const {createServer, defineConfig} = require('vite');
-const {glslify} = require('vite-plugin-glslify');
 const utils = require('./utils.js');
 
 class Run {
@@ -28,10 +27,10 @@ class Run {
                 hmr: true
             },
             plugins: [
-                glslify()
+                // glslify()
             ],
             define : {
-                __configFile__ : `"${this._config.configFile}"`,
+                __configFile__ : JSON.stringify(this._config.configFile),
                 __version__ : `"${this._config.version}"`
             }
         }
@@ -61,7 +60,7 @@ class Run {
 
         const server = await createServer(config);
         await server.listen()
-
+        server.printUrls();
     }
 
     watch(path, cb) {

@@ -17,16 +17,16 @@ class SketchKit {
                 'dest': 'css/',
                 'entry': 'main.scss'
             },
-            'configFile' : options.configFile || utils.defaultConfigFile,
+            'configFile': options.configFile || utils.defaultConfigFile,
             'include_modules': true,
-            'version' : 'v' + version
+            'version': 'v' + version
         };
 
         if (this._IsInitialized()) {
             var configFile = options.configFile || utils.defaultConfigFile;
             configFile = utils.getConfigFilePath(configFile);
             this.config.configFile = configFile;
-        }else{
+        } else {
             this.config.configFile = utils.defaultConfigFile;
         }
     }
@@ -108,6 +108,13 @@ class SketchKit {
         })
     }
 
+    preview(args) {
+
+        var Preview = require('./preview.js');
+        var preview = new Preview(this.config,args);
+        return preview.start();
+    }
+
     //-----------------------------------------------------
 
     /***
@@ -129,12 +136,12 @@ class SketchKit {
         return new Promise((resolve, reject) => {
             if (this._IsInitialized()) {
 
-                fs.readFile("./sketch-kit/" + this.config.configFile, 'utf-8', (err, data) => {
+                fs.readFile('./sketch-kit/' + this.config.configFile, 'utf-8', (err, data) => {
 
                     if (err) {
                         console.log(err, configFile);
                         resolve(this.config)
-                    }else {
+                    } else {
                         //merge global and local configs
                         this.config = {
                             ...this.config,
