@@ -118,7 +118,7 @@ sketch-kit will create a `build/` folder containing a static build of the projec
 
 ### Global Options
 
-_configFile_
+~~_configFile_~~ NO LONGER SUPPORTED
 
 Define an alternative config file for different distributions.
 
