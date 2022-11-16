@@ -1,6 +1,6 @@
 var path = require('path');
 var fs = require('fs');
-
+const glslify = require('rollup-plugin-glslify');
 const {createServer, defineConfig} = require('vite');
 const utils = require('./utils.js');
 
@@ -27,7 +27,7 @@ class Run {
                 hmr: true
             },
             plugins: [
-                // glslify()
+                glslify()
             ],
             define : {
                 __configFile__ : JSON.stringify(this._config.configFile),

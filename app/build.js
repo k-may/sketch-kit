@@ -1,6 +1,7 @@
 const {build} = require('vite');
 const path = require('path');
 const utils = require('./utils.js');
+const glslify = require('rollup-plugin-glslify');
 
 module.exports = class Build {
 
@@ -23,7 +24,7 @@ module.exports = class Build {
                 outDir,
             },
             plugins: [
-                // glslify()
+                glslify()
             ],
             define : {
                 __version__ : `"${this._config.version}"`
