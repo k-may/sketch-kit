@@ -1,6 +1,6 @@
 {
   "name": "sketch-kit",
-  "version": "1.5.7",
+  "version": "1.5.8",
   "description": "Rapid prototyping framework for HTML5/Javascript",
   "main": "index.js",
   "bin": {
@@ -9,7 +9,7 @@
   "preferGlobal": true,
   "scripts": {
     "start": "node index.js",
-    "test": "mocha 'test/**/*.js' --recursive --timeout 60000"
+    "test": "mocha 'test/**/*.js'"
   },
   "repository": {
     "type": "git",
