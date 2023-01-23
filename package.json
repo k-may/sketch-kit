@@ -36,11 +36,12 @@
     "path": "latest",
     "replace": "^1.2.1",
     "sass": "^1.50.0",
-    "vite": "^3.2.4"
-  },
-  "devDependencies": {
+    "vite": "^3.2.4",
     "mocha": "^9.2.2",
     "os": "^0.1.2",
     "rollup-plugin-glslify": "^1.3.1"
+  },
+  "devDependencies": {
+
   }
 }
