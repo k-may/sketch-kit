@@ -170,4 +170,4 @@ The base sketch-kit.config.json defines the sketches which are visible while run
 
 ## Contact
 
-Kevin May - [@kev_mayo](https://twitter.com/kev_mayo) / [email](mailto:kevmayo@gmail.com)
+Kevin Mayo - [@kev_mayo](https://twitter.com/kev_mayo) / [email](mailto:kevmayo@gmail.com)
