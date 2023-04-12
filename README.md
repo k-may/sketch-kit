@@ -1,5 +1,4 @@
 
-# sketch-kit
 ![alt text](sketch-kit.png "Logo Title Text 1")
 
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fk-may%2Fsketch-kit.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fk-may%2Fsketch-kit?ref=badge_shield)
@@ -7,6 +6,27 @@
 [![npm version](https://badge.fury.io/js/sketch-kit.svg)](https://badge.fury.io/js/sketch-kit)
 
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fk-may%2Fsketch-kit.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fk-may%2Fsketch-kit?ref=badge_shield)
+
+
+<!-- TABLE OF CONTENTS -->
+<details>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li>
+      <a href="#about-the-project">About The Project</a>
+      <ul>
+        <li><a href="#built-with">Built With</a></li>
+      </ul>
+    </li>
+    <li><a href="#roadmap">Roadmap</a></li>
+    <li><a href="#setup">Setup</a></li>
+    <li><a href="#cli">CLI</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ol>
+</details>
+
+<!-- ABOUT THE PROJECT -->
+## About The Project
 
 Rapid prototyping framework for HTML5 projects
 
@@ -21,12 +41,28 @@ Sketch-Kit is designed to live along-side your project (a sketch-kit/ folder wil
 - Quick **iteration** on sketches
 - Not being bound to a _safety-first_ developer mindset, encourage developers to have a little fun and **be expressive**!
 
-**Features**:
+### Built With
+
 - [vite](https://vitejs.dev/) (HMR, development, building)
 - [glslify](https://github.com/glslify/glslify)
 - sass
 
 ![alt text](https://github.com/k-may/sketch-kit/raw/master/design/Screenshot%202022-06-01%20113728.png "Screen Grab")
+
+## Roadmap
+
+- [x] Migrate to [vite](https://vitejs.dev/) for HMR and build tools
+- [ ] UI Improvements:
+  - [x] Add fullscreen button
+  - [ ] Add 'create sketch' button
+- [ ] Console Improvements:
+  - [ ] Tagging via 'create' statement
+- [ ] Add support for [dat.gui](https://github.com/dataarts/dat.gui) to allow for easy control of sketch parameters
+
+- [ ] Add support for [three.js](https://threejs.org/) to allow for easy 3D prototyping
+
+- [ ] Add support for [p5.js](https://p5js.org/) to allow for easy 2D prototyping
+
 
 ## Setup
 
@@ -48,7 +84,7 @@ Each sketch exposes a interface for commonly used methods, the most important be
 
 ```
 
-## Commands
+## CLI
 ### Update
 
 `sketch-kit update`
@@ -130,3 +166,8 @@ The base sketch-kit.config.json defines the sketches which are visible while run
 
 ## License
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fk-may%2Fsketch-kit.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fk-may%2Fsketch-kit?ref=badge_large)
+
+
+## Contact
+
+Kevin May - [@kev_mayo](https://twitter.com/kev_mayo) / [email](mailto:kevmayo@gmail.com)
