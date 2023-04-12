@@ -10,6 +10,8 @@
   }
   --scrollbarBG: rgba(27, 27, 27, 0);
   --thumbBG: rgba(27, 27, 27, 0.4);
+  --footer-index: 10000;
+  --ui-padding: 20px;
 }
 
 * {
@@ -26,6 +28,13 @@ body {
   @include scroll-styles;
 }
 
+body.fullscreen{
+  nav, footer{
+    display: none;
+  }
+  cursor:none;
+  --thumbBG: rgba(27, 27, 27, 0);
+}
 
 .expander {
   width: 1px;
@@ -35,8 +44,31 @@ body {
   lefT: 0;
 }
 
-//SKETCH COMPASS CUBE
+button{
+  outline: none;
+  border:none;
+  user-select: none;
+  background-color: transparent;
+}
 
+footer {
+  position: fixed;
+  z-index: var(--footer-index);
+  bottom: 0;
+  padding: var(--ui-padding);
+
+  > button.fullscreen {
+    padding: 9px;
+    cursor: pointer;
+    white-space: nowrap;
+    color: $grey;
+    font-family: "Major Mono Display";
+
+    &:hover {
+      color: $pink;
+    }
+  }
+}
 
 .video {
   position: absolute;
