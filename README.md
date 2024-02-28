@@ -1,6 +1,8 @@
 
 ![alt text](sketch-kit.png "Logo Title Text 1")
 
+[![Node CI](https://github.com/k-may/sketch-kit/actions/workflows/nodejs.yml/badge.svg)](https://github.com/k-may/sketch-kit/actions/workflows/nodejs.yml)
+
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fk-may%2Fsketch-kit.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fk-may%2Fsketch-kit?ref=badge_shield)
 
 [![npm version](https://badge.fury.io/js/sketch-kit.svg)](https://badge.fury.io/js/sketch-kit)
