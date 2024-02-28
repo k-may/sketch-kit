@@ -9,7 +9,9 @@
   "preferGlobal": true,
   "scripts": {
     "start": "node index.js",
-    "test": "mocha 'test/**/*.js'"
+    "test": "mocha 'test/**/*.js'",
+    "clean" : "rm -rf node_modules && rm -rf sketch-kit"
+
   },
   "repository": {
     "type": "git",
