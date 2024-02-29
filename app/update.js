@@ -1,8 +1,9 @@
-var fs = require('fs-extra');
-var copyNodeModules = require('copy-node-modules');
-const utils = require('./utils.js');
 
-class Update {
+import fs from 'fs-extra';
+import copyNodeModules from 'copy-node-modules';
+import {utils} from './utils.js';
+
+export default class Update {
 
     constructor(config) {
         this.config = config;
@@ -57,4 +58,3 @@ class Update {
     }
 }
 
-module.exports = Update;

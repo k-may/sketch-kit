@@ -1,11 +1,15 @@
-var inquirer = require('inquirer');
-var fs = require('fs-extra');
-var os = require('os');
-var path = require('path');
-var replace = require('replace');
-var utils = require('./utils.js');
 
-class Create {
+import inquirer from 'inquirer';
+import fs from 'fs-extra';
+import os from 'os';
+import path from 'path';
+import {utils} from './utils.js';
+
+import * as url from 'url';
+const __filename = url.fileURLToPath(import.meta.url);
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
+
+export default class Create {
 
     constructor(config, args) {
 
@@ -315,5 +319,3 @@ class Create {
         return path.resolve(this._config.root, this._config.configFile);
     }
 }
-
-module.exports = Create;

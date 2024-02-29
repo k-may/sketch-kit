@@ -1,8 +1,8 @@
-var fs = require('fs-extra');
-const path = require('path');
-const replace = require('replace');
+import fs from 'fs-extra';
+import path from 'path';
+import replace from 'replace';
 
-const utils = {
+export const utils = {
 
     defaultConfigFile: 'sketch-kit.config.json',
 
@@ -18,7 +18,7 @@ const utils = {
             }
         }
 
-        configFilePath = path.join(publicDir, configFile)
+        let configFilePath = path.join(publicDir, configFile)
         if (!fs.existsSync(configFilePath)) {
 
             //finally check for previous version..
@@ -79,5 +79,3 @@ const utils = {
         console.log('\x1b[33mSK :: %s \x1b[0m', msg);
     }
 }
-
-module.exports = utils;

@@ -1,12 +1,17 @@
-var fs = require('fs-extra');
-var path = require('path');
-var inquirer = require('inquirer');
-var replace = require('replace');
-var utils = require('./utils.js');
+
+import fs from 'fs-extra';
+import path from 'path';
+import inquirer from 'inquirer';
+import replace from 'replace';
+import {utils} from './utils.js';
+
+import * as url from 'url';
+const __filename = url.fileURLToPath(import.meta.url);
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 const FOLDER_NAME = 'sketch-kit';
 
-module.exports = class Main {
+export default class Main {
 
     constructor(config) {
         this._config = config;

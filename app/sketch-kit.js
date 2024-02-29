@@ -1,9 +1,9 @@
-var fs = require('fs-extra');
-var U = require('./update');
-const utils = require('./utils.js');
-const {version} = require('../package.json');
+import fs from 'fs-extra';
+import Update from './update.js';
+import {utils} from './utils.js';
+import packageJson from '../package.json' assert {type: "json"};
 
-class SketchKit {
+export default class SketchKit {
 
     //TODO add clean task
 
@@ -19,7 +19,7 @@ class SketchKit {
             },
             'configFile': options.configFile || utils.defaultConfigFile,
             'include_modules': true,
-            'version': 'v' + version
+            'version': 'v' + packageJson.version
         };
 
         if (this._IsInitialized()) {
@@ -41,8 +41,8 @@ class SketchKit {
         try {
             await this.update()
             if (this._IsInitialized()) {
-                var Create = require('./create');
-                var create = new Create(this.config, args);
+                var Create = await import('./create.js');
+                var create = new Create.default(this.config, args);
                 return create.start();
             } else {
                 throw new Error('Sketch-Kit not initialized!\nPlease run \'test init\' first.');
@@ -55,9 +55,9 @@ class SketchKit {
     /**
      * Initiates Sketch-Kit with application folder and build tasks
      */
-    init() {
-        var Init = require('./init');
-        var init = new Init(this.config);
+    async init() {
+        var Init = await import('./init.js');
+        var init = new Init.default(this.config);
         return init.run();
     }
 
@@ -72,7 +72,7 @@ class SketchKit {
 
             if (this._IsInitialized()) {
                 this._getConfig().then(config => {
-                    var update = new U(config);
+                    var update = new Update(config);
                     update.start().then(() => {
                         resolve();
                     });
@@ -88,30 +88,24 @@ class SketchKit {
     /**
      * Runs gulp taks for project (sass, webpack, serve)
      */
-    run(args, context) {
-        this.update().then(() => {
-            var Run = require('./run');
-            var run = new Run(this.config, args);
-            return run.start();
-        }).catch((e) => {
-            console.log('Run error : ' + e);
-        });
+    async run(args, context) {
+        await this.update()
+        var Run = await import('./run.js');
+        var run = new Run.default(this.config, args);
+        return run.start();
     }
 
-    build(args) {
-        this.update().then(() => {
-            var Build = require('./build');
-            var build = new Build(this.config, args);
-            return build.start();
-        }).catch(e => {
-            console.log('Build error : ' + e);
-        })
+    async build(args) {
+        await this.update();
+        var Build = await import('./build.js');
+        var build = new Build.default(this.config, args);
+        return build.start();
     }
 
-    preview(args) {
+    async preview(args) {
 
-        var Preview = require('./preview.js');
-        var preview = new Preview(this.config,args);
+        var Preview = await import('./preview.js');
+        var preview = new Preview.default(this.config, args);
         return preview.start();
     }
 
@@ -155,5 +149,3 @@ class SketchKit {
         });
     }
 }
-
-module.exports = SketchKit;

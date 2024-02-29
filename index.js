@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 /* eslint-disable no-undef */
-const minimist = require('minimist');
-const SketchKit = require('./app/sketch-kit');
-const {version} = require('./package.json');
+
+import minimist from 'minimist';
+import SketchKit from './app/sketch-kit.js';
+import packageJson from './package.json' assert {type: "json"};
+const {version} = packageJson;
 
 // Function to display help information
 function displayHelp() {

@@ -1,8 +1,8 @@
-const {preview} = require('vite');
-const path = require('path');
-const utils = require('./utils.js');
+import {preview} from 'vite';
+import path from 'path';
+import {utils} from './utils.js';
 
-module.exports = class Preview {
+export default class Preview {
 
     constructor(config, args) {
         this._args = args;

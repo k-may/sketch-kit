@@ -1,10 +1,11 @@
-var path = require('path');
-var fs = require('fs');
-const glslify = require('rollup-plugin-glslify');
-const {createServer, defineConfig} = require('vite');
-const utils = require('./utils.js');
 
-class Run {
+import path from "path";
+import fs from "fs";
+import glslify from "rollup-plugin-glslify";
+import {createServer} from "vite";
+import {utils} from "./utils.js";
+
+export default class Run {
 
     constructor(config, args) {
         this._args = args;
@@ -76,5 +77,3 @@ class Run {
 
     }
 }
-
-module.exports = Run;

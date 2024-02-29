@@ -1,9 +1,10 @@
-const {build} = require('vite');
-const path = require('path');
-const utils = require('./utils.js');
-const glslify = require('rollup-plugin-glslify');
 
-module.exports = class Build {
+import {build} from 'vite';
+import path from 'path';
+import {utils} from './utils.js';
+import glslify from 'rollup-plugin-glslify';
+
+export default class Build {
 
     constructor(config, args) {
         this._args = args;
