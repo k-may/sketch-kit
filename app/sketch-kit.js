@@ -1,7 +1,7 @@
 import fs from 'fs-extra';
 import Update from './update.js';
 import {utils} from './utils.js';
-import packageJson from '../package.json' assert {type: "json"};
+import packageJson from '../package.json' with {type: "json"};
 
 export default class SketchKit {
 

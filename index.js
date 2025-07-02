@@ -3,7 +3,7 @@
 
 import minimist from 'minimist';
 import SketchKit from './app/sketch-kit.js';
-import packageJson from './package.json' assert {type: "json"};
+import packageJson from './package.json' with {type: "json"};
 const {version} = packageJson;
 
 // Function to display help information

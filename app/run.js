@@ -1,7 +1,7 @@
 
 import path from "path";
 import fs from "fs";
-import glslify from "rollup-plugin-glslify";
+import glslify from "vite-plugin-glsl";
 import {createServer} from "vite";
 import {utils} from "./utils.js";
 

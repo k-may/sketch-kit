@@ -2,7 +2,8 @@
 import {build} from 'vite';
 import path from 'path';
 import {utils} from './utils.js';
-import glslify from 'rollup-plugin-glslify';
+import glslify from 'vite-plugin-glsl';
+import {viteStaticCopy} from "vite-plugin-static-copy";
 
 export default class Build {
 
@@ -17,6 +18,7 @@ export default class Build {
 
         const publicDir = path.resolve(process.cwd(), 'sketch-kit');
         const outDir = path.resolve(process.cwd(), 'sketch-kit/build');
+        const assetDir = path.resolve(process.cwd(), 'sketch-kit/assets');
 
         return build({
             root: publicDir,
@@ -25,7 +27,15 @@ export default class Build {
                 outDir,
             },
             plugins: [
-                glslify()
+                glslify(),
+                viteStaticCopy({
+                    targets: [
+                        {
+                            src: "assets/**/*",
+                            dest: 'assets'
+                        }
+                    ]
+                })
             ],
             define : {
                 __version__ : `"${this._config.version}"`
