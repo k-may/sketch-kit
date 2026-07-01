@@ -1,4 +1,3 @@
-
 import inquirer from 'inquirer';
 import fs from 'fs-extra';
 import os from 'os';
@@ -6,10 +5,12 @@ import path from 'path';
 import {utils} from './utils.js';
 
 import * as url from 'url';
-const __filename = url.fileURLToPath(import.meta.url);
+
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 export default class Create {
+
+    sketchConfig = null;
 
     constructor(config, args) {
 
@@ -23,7 +24,8 @@ export default class Create {
 
         utils.log("Create");
 
-        var config = await this._getConfig();
+        await this._getConfig();
+
         if (this.sketchName) {
             await this._tryCreateSketch(this.sketchName, os.userInfo().username);
         } else
@@ -53,10 +55,10 @@ export default class Create {
         this.author = author;
 
         if (this.sketchConfig.sketches.hasOwnProperty(name)) {
-            if(process.env.TEST)
-               return this._copySketch(this.sketchName, this.author)
+            if (process.env.TEST === "true")
+                return this._copySketch(this.sketchName, this.author)
             else
-               this._seeReplaceOrCopy();
+                this._seeReplaceOrCopy();
         } else if (name === '') {
             console.log('Name not valid');
             return this._prompt();
@@ -71,7 +73,7 @@ export default class Create {
             'type': 'list',
             'message': '\x1b[33mSketch already exists, would you like to replace it or copy it?',
             'name': 'replace',
-            'choices': ['copy', 'replace', 'niether']
+            'choices': ['copy', 'replace', 'neither']
         }).then(result => {
 
             if (result.replace === 'replace')
@@ -115,8 +117,6 @@ export default class Create {
         //cleanup names
         name = name.replace('-', '');
 
-        var sketchKitPath = './sketch-kit/js/sketches/' + name;
-
         try {
             await this._createScript(name);
             await this._createSass(name);
@@ -156,20 +156,19 @@ export default class Create {
         utils.replaceNameInFile(replaceName, name, sketchKitPath);
 
         //copy deps
-        if(copyDeps) {
+        if (copyDeps) {
             const templateFileName = path.basename(templatePath);
             const templateDirName = path.dirname(templatePath);
             const files = await fs.promises.readdir(templateDirName);
-            files.forEach(async (file) => {
+            for (const file of files) {
                 if (file !== templateFileName) {
                     await fs.copy(path.join(templateDirName, file), sketchFolder + file);
                 }
-            });
+            }
         }
     }
 
     async _createSass(name, templatePath, replaceName) {
-
 
         if (!templatePath) {
             templatePath = path.resolve(__dirname, '../');
@@ -187,17 +186,14 @@ export default class Create {
 
         //append import to entry point..
         var sassEntryPath = './sketch-kit/scss/main.scss';
-        return new Promise((resolve => {
-            fs.readFile(sassEntryPath, 'utf8', (err, data) => {
-                if (err) {
-                    console.log(err.message);
-                    throw err;
-                }
-                data += `\n@import "sketches/${name}";`
-                fs.writeFile(sassEntryPath, data);
-                resolve();
-            });
-        }))
+        try {
+            let data = await fs.readFile(sassEntryPath, 'utf8');
+            data += `\n@import "sketches/${name}";`;
+            await fs.writeFile(sassEntryPath, data);
+        } catch (err) {
+            console.log(err.message);
+            throw err;
+        }
 
     }
 
@@ -230,11 +226,6 @@ export default class Create {
 
     }
 
-    _seeTreeDepth(name) {
-        var lastIndex = name.lastIndexOf('_');
-        return name.substring(lastIndex);
-    }
-
     /**
      * Converts branching syntax to multidimensional array
      * @param name
@@ -251,12 +242,6 @@ export default class Create {
             //initial sketch....
             return [];
         }
-    }
-
-    _seeRoot(name) {
-        var lastIndex = name.lastIndexOf('_');
-        name = name.substring(0, lastIndex);
-        return name.substring(name.indexOf('_'));
     }
 
     _seeSketchTreeName(current) {
@@ -294,22 +279,19 @@ export default class Create {
         }];
     }
 
-    _getConfig() {
-        return new Promise((resolve, reject) => {
+    async _getConfig() {
+        var sketchConfigPath = this._getConfigPath();
 
-            var sketchConfigPath = this._getConfigPath();
+        try {
+            this.sketchConfig = await fs.readJSON(sketchConfigPath);
+        } catch (e) {
+            // try legacy path
+            this._config.legacy = true;
+            sketchConfigPath = this._getConfigPath();
+            this.sketchConfig = await fs.readJSON(sketchConfigPath);
+        }
 
-            try {
-                this.sketchConfig = fs.readJSONSync(sketchConfigPath);
-            } catch (e) {
-                this._config.legacy = true;
-                sketchConfigPath = this._getConfigPath();
-                this.sketchConfig = fs.readJSONSync(sketchConfigPath);
-            }
-
-            resolve(this.sketchConfig);
-
-        });
+        return this.sketchConfig;
     }
 
     _getConfigPath() {

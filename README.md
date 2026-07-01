@@ -7,8 +7,6 @@
 
 [![npm version](https://badge.fury.io/js/sketch-kit.svg)](https://badge.fury.io/js/sketch-kit)
 
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fk-may%2Fsketch-kit.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fk-may%2Fsketch-kit?ref=badge_shield)
-
 
 <!-- TABLE OF CONTENTS -->
 <details>
@@ -87,17 +85,6 @@ Each sketch exposes a interface for commonly used methods, the most important be
 ```
 
 ## CLI
-### Update
-
-`sketch-kit update`
-
-This is called by default by the following commands. Copies dependencies from package.json into the sketches folder.
-
-**Note;** as of writing, most npm dependencies don't support es6 modules, to import deps into your sketch you'll most likely need to do something like the following to statically import them :
-
-```
-import '../../../node_modules/[library path]
-```
 
 ### Init
 
@@ -172,4 +159,4 @@ The base sketch-kit.config.json defines the sketches which are visible while run
 
 ## Contact
 
-Kevin Mayo - [@kev_mayo](https://twitter.com/kev_mayo) / [email](mailto:kevmayo@gmail.com)
+[Kev Mayo](https://kevinmayo.com)  / [email](mailto:hello@kevinmayo.com)

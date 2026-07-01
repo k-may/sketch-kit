@@ -35,21 +35,17 @@ export const utils = {
         return configFile;
     },
 
-    loadConfig: function (configFile) {
-
-        return new Promise((resolve, reject) => {
-
-            const configFilePath = './sketch-kit/' + configFile;
-            fs.readFile(configFilePath, 'utf8', (err, config) => {
-                if (err) {
-                    fs.readFile('./sketch-kit/data/config.json', 'utf8', (err, config) => {
-                        resolve({config: JSON.parse(config), path: './sketch-kit/data/config.json'});
-                    });
-                } else
-                    resolve({config: JSON.parse(config), path: configFilePath});
-            });
-
-        });
+    loadConfig: async function (configFile) {
+        const configFilePath = path.resolve(process.cwd(), 'sketch-kit', configFile);
+        try {
+            const data = await fs.readFile(configFilePath, 'utf8');
+            return { config: JSON.parse(data), path: configFilePath };
+        } catch (err) {
+            // fallback to legacy path
+            const legacyPath = path.resolve(process.cwd(), 'sketch-kit', 'data', 'config.json');
+            const legacyData = await fs.readFile(legacyPath, 'utf8');
+            return { config: JSON.parse(legacyData), path: legacyPath };
+        }
     },
 
     replaceNameInFile: function (regex, replacement, paths) {

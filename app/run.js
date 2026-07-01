@@ -1,4 +1,3 @@
-
 import path from "path";
 import fs from "fs";
 import glslify from "vite-plugin-glsl";
@@ -25,14 +24,17 @@ export default class Run {
             server: {
                 port: 3002,
                 host: true,
-                hmr: true
+                hmr: true,
+                fs: {
+                    allow: [process.cwd()]
+                }
             },
             plugins: [
                 glslify()
             ],
-            define : {
-                __configFile__ : JSON.stringify(this._config.configFile),
-                __version__ : `"${this._config.version}"`
+            define: {
+                __configFile__: JSON.stringify(this._config.configFile),
+                __version__: `"${this._config.version}"`
             }
         }
 
@@ -55,7 +57,7 @@ export default class Run {
                 }
             }
 
-        }catch(e){
+        } catch (e) {
             utils.message("No certs found, defaulting to http")
         }
 
@@ -64,16 +66,4 @@ export default class Run {
         server.printUrls();
     }
 
-    watch(path, cb) {
-        var tmeOut;
-        fs.watch(path, {recursive: true}, () => {
-            if (!tmeOut) {
-                tmeOut = setTimeout(() => {
-                    cb();
-                    tmeOut = null;
-                });
-            }
-        });
-
-    }
 }

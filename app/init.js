@@ -21,7 +21,7 @@ export default class Main {
 
         utils.log("Init");
 
-        if (this._IsInitialized()) {
+        if (this._isInitialized()) {
             throw new Error('Sketch-Kit already initialized');
         } else {
             return this._initialize();
@@ -52,7 +52,6 @@ export default class Main {
 
         await this._copyApp();
         await this._copyConfig(result);
-        await this._updateIgnore();
 
     }
 
@@ -65,7 +64,7 @@ export default class Main {
      * @returns {boolean}
      * @private
      */
-    _IsInitialized() {
+    _isInitialized() {
 
         if (fs.existsSync('./' + FOLDER_NAME)) {
             return true;
@@ -81,32 +80,8 @@ export default class Main {
             'message': '\x1b[33mProject name',
             'name': 'sketch',
             'default': defaultName
-        }, {
-            'type': 'input',
-            'message': '\x1b[33mWould you like to include node dependencies?',
-            'name': 'copyDependencies',
-            'choices': ['yes', 'no'],
-            'default': 'yes',
-            validate: answer => {
-                return answer === 'yes' || answer === 'no'
-            }
         }];
 
-    }
-
-    /***
-     * Updates ingore file with Sketch-Kit vendor path.
-     * @private
-     */
-    _updateGitignore() {
-        if (fs.existsSync('.gitignore')) {
-            var vendorPath = path.join(this._config.root, 'js/vendor');
-            var gIgnore = fs.readFileSync('./.gitignore', 'utf8');
-            if (gIgnore.indexOf(vendorPath) == -1) {
-                gIgnore += '\n' + vendorPath;
-                fs.writeFile('./.gitignore', gIgnore);
-            }
-        }
     }
 
     /***
@@ -114,20 +89,13 @@ export default class Main {
      *
      * @private
      */
-    _copyApp() {
-
-        return new Promise(resolve => {
-            var sketchKitPath = path.resolve(__dirname, '../');
-            sketchKitPath = path.join(sketchKitPath + '/lib/' + FOLDER_NAME);
-            fs.copy(sketchKitPath, './' + FOLDER_NAME, () => {
-                resolve();
-            });
-
-        });
-
+    async _copyApp() {
+        var sketchKitPath = path.resolve(__dirname, '../');
+        sketchKitPath = path.join(sketchKitPath + '/lib/' + FOLDER_NAME);
+        await fs.copy(sketchKitPath, './' + FOLDER_NAME);
     }
 
-    async _copyConfig({sketch, copyDependencies}) {
+    async _copyConfig({sketch}) {
 
         const {config, path} = await utils.loadConfig(this._config.configFile);//.then(({config, path}) => {
         //replace all sketch names throughout template
@@ -140,30 +108,10 @@ export default class Main {
         });
 
         config.project = sketch;
-        config.copyDependencies = copyDependencies === 'yes';
         config.version = this._config.version;
 
         await fs.writeFile(path, JSON.stringify(config, null, 4));
 
-    }
-
-    /**
-     * Make sure copied node modules aren't included in the repo..
-     *
-     * @return {Promise<unknown>}
-     * @private
-     */
-    async _updateIgnore() {
-
-        const ignorePath = path.join(process.cwd(), '.gitignore');
-        return new Promise(resolve => {
-            fs.appendFile(ignorePath, '/sketch-kit/js/node_modules/', function (err) {
-                if (err)
-                    console.log(err.message);
-
-                resolve();
-            });
-        })
     }
 
 };

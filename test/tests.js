@@ -6,10 +6,22 @@ import {SketchUtils} from "../lib/sketch-kit/js/utils/SketchUtils.js";
 
 const sketchesPath = path.resolve(process.cwd(), 'sketch-kit');
 
-var sketches;
+let sketches;
+
+function generateRandomString(length) {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+
+    for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        result += characters.charAt(randomIndex);
+    }
+
+    return result;
+}
 
 //========================================================
-process.env.TEST = true;
+process.env.TEST = "true";
 
 before(() => {
     sketches = new SketchKit({debug: true});
@@ -22,10 +34,10 @@ describe('CLI Tests', () => {
 
     it('sketch-kit/ folder created', async () => {
 
-        await fs.removeSync(sketchesPath);
+        await fs.remove(sketchesPath);
 
         await sketches.init()
-        var folderExist = await fs.existsSync(sketchesPath);
+        const folderExist = await fs.existsSync(sketchesPath);
         assert(folderExist, 'sketch-kit initialized');
 
     });
@@ -33,8 +45,8 @@ describe('CLI Tests', () => {
 
         await sketches.create(['test']);
 
-        var sketchPath = path.join(sketchesPath, '/js/sketches/test');
-        var folderExist = await fs.existsSync(sketchPath);
+        const sketchPath = path.join(sketchesPath, '/js/sketches/test');
+        const folderExist = await fs.pathExists(sketchPath);
 
         assert(folderExist, 'sketch was created');
 
@@ -43,8 +55,8 @@ describe('CLI Tests', () => {
 
         await sketches.create(['test', 'forceCopy']);
 
-        var sketchPath = path.join(sketchesPath, '/js/sketches/forceCopy');
-        var folderExist = await fs.existsSync(sketchPath);
+        const sketchPath = path.join(sketchesPath, '/js/sketches/forceCopy');
+        const folderExist = await fs.existsSync(sketchPath);
 
         assert(folderExist, `sketch was copied : ${sketchPath} / exists : ${folderExist}`);
 
@@ -52,25 +64,13 @@ describe('CLI Tests', () => {
 
     it("sketch-kit built", async () => {
         await sketches.build();
-        var buildPath = path.join(sketchesPath, '/build');
-        var folderExist = await fs.existsSync(buildPath);
+        const buildPath = path.join(sketchesPath, '/build');
+        const folderExist = await fs.existsSync(buildPath);
         assert(folderExist, 'build folder exists');
     });
 });
 
 describe("Sketches Tests", () => {
-
-    function generateRandomString(length) {
-        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        let result = '';
-
-        for (let i = 0; i < length; i++) {
-            const randomIndex = Math.floor(Math.random() * characters.length);
-            result += characters.charAt(randomIndex);
-        }
-
-        return result;
-    }
 
     it("Name is sanitized", () => {
         //generate random names
@@ -85,22 +85,12 @@ describe("Sketches Tests", () => {
         }
 
         const isValidCustomElementName = /^[a-z][a-z0-9]*-[a-z0-9-]*$/;
-        let isSanitized = true;
 
-        for (let i = 0; i < numNames; i++) {
-            let name = names[i];
-            isSanitized = isValidCustomElementName.test(name.sanitizeElementName);
-            if (!isSanitized) {
-                console.warn("Name not sanitized : ", name);
-                break;
-            }
-        }
+        const failures = names.filter(n => !isValidCustomElementName.test(n.sanitizeElementName));
+        assert(failures.length === 0, `Unsanitized names: ${JSON.stringify(failures)}`);
 
-        assert(isSanitized, "All names are sanitized");
     });
 });
-after(() => {
-    fs.removeSync(sketchesPath, {}, err => {
-        console.log(err);
-    })
+after(async () => {
+    await fs.remove(sketchesPath);
 });

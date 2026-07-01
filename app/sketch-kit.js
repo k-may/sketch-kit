@@ -1,5 +1,4 @@
 import fs from 'fs-extra';
-import Update from './update.js';
 import {utils} from './utils.js';
 import packageJson from '../package.json' with {type: "json"};
 
@@ -22,7 +21,7 @@ export default class SketchKit {
             'version': 'v' + packageJson.version
         };
 
-        if (this._IsInitialized()) {
+        if (this._isInitialized()) {
             var configFile = options.configFile || utils.defaultConfigFile;
             configFile = utils.getConfigFilePath(configFile);
             this.config.configFile = configFile;
@@ -37,19 +36,11 @@ export default class SketchKit {
      * Prompts for info and appends new sketch to sketches
      */
     async create(args) {
+        await this.update()
 
-        try {
-            await this.update()
-            if (this._IsInitialized()) {
-                var Create = await import('./create.js');
-                var create = new Create.default(this.config, args);
-                return create.start();
-            } else {
-                throw new Error('Sketch-Kit not initialized!\nPlease run \'test init\' first.');
-            }
-        } catch (e) {
-            console.log(e);
-        }
+        var Create = await import('./create.js');
+        var create = new Create.default(this.config, args);
+        return create.start();
     }
 
     /**
@@ -66,46 +57,44 @@ export default class SketchKit {
      *
      * @returns {Promise}
      */
-    update() {
+    async update() {
+        if (!fs.existsSync('./sketch-kit')) {
+            throw new Error("Sketch-Kit not initialized. Please run 'sketch-kit init' first.");
+        }
 
-        return new Promise((resolve, reject) => {
+        try {
+            const data = await fs.readFile('./sketch-kit/' + this.config.configFile, 'utf-8');
+            this.config = {...this.config, ...JSON.parse(data)};
+        } catch (err) {
+            // First time — no config file found, use default config
+            console.log(err, this.config.configFile);
+        }
 
-            if (this._IsInitialized()) {
-                this._getConfig().then(config => {
-                    var update = new Update(config);
-                    update.start().then(() => {
-                        resolve();
-                    });
-                });
-            } else {
-                console.log('Sketch-Kit not initialized!\n');
-                console.log('Please run \'test init\' first.');
-                reject();
-            }
-        });
     }
 
     /**
      * Runs gulp taks for project (sass, webpack, serve)
      */
-    async run(args, context) {
+    async run(args) {
+
         await this.update()
-        var Run = await import('./run.js');
-        var run = new Run.default(this.config, args);
+
+        const Run = await import('./run.js');
+        const run = new Run.default(this.config, args);
         return run.start();
     }
 
     async build(args) {
         await this.update();
-        var Build = await import('./build.js');
-        var build = new Build.default(this.config, args);
+        const Build = await import('./build.js');
+        const build = new Build.default(this.config, args);
         return build.start();
     }
 
     async preview(args) {
 
-        var Preview = await import('./preview.js');
-        var preview = new Preview.default(this.config, args);
+        const Preview = await import('./preview.js');
+        const preview = new Preview.default(this.config, args);
         return preview.start();
     }
 
@@ -117,7 +106,7 @@ export default class SketchKit {
      * @returns {boolean}
      * @private
      */
-    _IsInitialized() {
+    _isInitialized() {
 
         if (fs.existsSync('./sketch-kit')) {
             return true;
@@ -126,26 +115,4 @@ export default class SketchKit {
         return false;
     }
 
-    _getConfig() {
-        return new Promise((resolve, reject) => {
-            if (this._IsInitialized()) {
-
-                fs.readFile('./sketch-kit/' + this.config.configFile, 'utf-8', (err, data) => {
-
-                    if (err) {
-                        console.log(err, configFile);
-                        resolve(this.config)
-                    } else {
-                        //merge global and local configs
-                        this.config = {
-                            ...this.config,
-                            ...JSON.parse(data)
-                        };
-                        resolve(this.config);
-                    }
-                });
-            } else
-                reject();
-        });
-    }
 }

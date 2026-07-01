@@ -6,6 +6,5 @@
     }
   },
   "include_modules": true,
-  "project": "",
-  "copyDependencies": true
+  "project": ""
 }

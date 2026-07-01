@@ -59,8 +59,7 @@ function main() {
                 s.preview(args);
                 break;
             default :
-                console.log('No Command, will update instead.')
-                s.update(args);
+                displayHelp();
                 break;
 
         }
