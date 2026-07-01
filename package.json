@@ -1,6 +1,6 @@
 {
   "name": "sketch-kit",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "description": "Rapid prototyping framework for HTML5/Javascript",
   "main": "index.js",
   "bin": {
@@ -18,7 +18,9 @@
     "url": "git+https://github.com/k-may/sketch-kit.git"
   },
   "keywords": [
-    "prototyping", "HTML5", "kit"
+    "prototyping",
+    "HTML5",
+    "kit"
   ],
   "author": "k-may (https://github.com/k-may)",
   "license": "ISC",
