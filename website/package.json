@@ -8,6 +8,7 @@
     "preview": "astro preview"
   },
   "dependencies": {
+    "@material/web": "^2.5.0",
     "astro": "^7.3.2",
     "lit": "^3.0.0"
   }

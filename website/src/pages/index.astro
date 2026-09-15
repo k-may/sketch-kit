@@ -1,10 +1,15 @@
 ---
-import '../styles/site.css';
-import IterationIcon from '../components/IterationIcon.astro';
-const github = 'https://github.com/k-may/sketch-kit';
-const title = 'Sketch Kit — make a mess. Keep the good parts.';
-const description = 'Sketch Kit is a rapid prototyping environment for expressive JavaScript. Create, play, copy, change, compare and keep your best sketches.';
+import "../styles/site.css";
+import "../styles/material-theme/css/light.css";
+import IterationIcon from "../components/IterationIcon.astro";
+
+const github = "https://github.com/k-may/sketch-kit";
+const personalSite = "https://kevinmayo.com";
+const title = "Sketch Kit — make a mess. Keep the good parts.";
+const description =
+  "Sketch Kit is a rapid prototyping environment for expressive JavaScript. Create, play, copy, change, compare and keep your best sketches.";
 ---
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -18,53 +23,243 @@ const description = 'Sketch Kit is a rapid prototyping environment for expressiv
     <title>{title}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Major+Mono+Display&display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Major+Mono+Display&display=swap"
+      rel="stylesheet"
+    />
   </head>
-  <body>
+  <body class="light">
     <a class="skip" href="#main">Skip to content</a>
     <header class="site-header shell">
-      <a class="wordmark reveal" href="#top" aria-label="Sketch Kit home"><span class="wordmark-mark"><IterationIcon shape="circle-square" /></span> sketch kit<span class="wordmark-period">.</span></a>
+      <a class="wordmark reveal" href="#top" aria-label="Sketch Kit home"
+        ><span class="wordmark-mark"
+          ><IterationIcon shape="circle-square" /></span
+        > sketch kit<span class="wordmark-period">.</span></a
+      >
       <nav aria-label="Main navigation" class="reveal">
-        <a href="#method">method</a>
-        <a href="#demo">iterations</a>
-        <a href="#install">install</a>
-        <a class="nav-github" href={github}>GitHub ↗</a>
+        <md-text-button href="#method">method</md-text-button>
+        <md-text-button href="#demo">iterations</md-text-button>
+        <md-text-button href="#install">install</md-text-button>
+        <md-text-button href={personalSite}>kevinmayo.com ↗</md-text-button>
+        <md-text-button class="nav-github" href={github}
+          >GitHub ↗</md-text-button
+        >
       </nav>
     </header>
     <main id="main">
       <section id="top" class="hero shell" aria-labelledby="hero-title">
-        <div class="hero-top annotation reveal"><span>field notes / 001</span><span>prototype freely <span class="annotation-marker"><IterationIcon shape="circle" /></span> keep deliberately</span></div>
-        <div class="hero-copy">
-          <p class="eyebrow reveal"><span class="signal-marker"><IterationIcon shape="square" /></span> rapid prototyping for expressive JavaScript</p>
-          <h1 id="hero-title" class="reveal">Make a mess.<br><span>Keep the good parts.</span></h1>
-          <p class="hero-lead reveal">A small protected space beside your project, where ideas can be rough, code can move quickly, and every good accident can become the next iteration.</p>
-          <div class="hero-actions reveal"><a class="action-primary" href={github}>Explore the repository <span aria-hidden="true">↗</span></a><a class="action-secondary" href="#method">Read the method <span aria-hidden="true">↓</span></a></div>
+        <div class="hero-top annotation reveal">
+          <span>field notes / 001</span><span
+            >prototype freely <span class="annotation-marker"
+              ><IterationIcon shape="circle" /></span
+            > keep deliberately</span
+          >
         </div>
-        <div class="hero-sketch" aria-hidden="true"><div class="hero-orbit orbit-one"></div><div class="hero-orbit orbit-two"></div><div class="hero-cross"><IterationIcon shape="circle-square" /></div><span class="hero-scribble scribble-a reveal">try / 01</span><span class="hero-scribble scribble-b reveal">keep? / 03</span></div>
-        <div class="hero-bottom annotation reveal"><span>notebook open / work in progress</span><span>scroll to investigate ↓</span></div>
+        <div class="hero-copy">
+          <p class="eyebrow reveal">
+            <span class="signal-marker"><IterationIcon shape="square" /></span> rapid
+            prototyping for expressive JavaScript
+          </p>
+          <h1 id="hero-title" class="reveal">
+            Make a mess.<br /><span>Keep the good parts.</span>
+          </h1>
+          <p class="hero-lead reveal">
+            A small protected space beside your project, where ideas can be
+            rough, code can move quickly, and every good accident can become the
+            next iteration.
+          </p>
+          <div class="hero-actions reveal">
+            <md-filled-button href={github}
+              >Explore the repository <span aria-hidden="true">↗</span
+              ></md-filled-button
+            >
+            <md-outlined-button href="#method"
+              >Read the method <span aria-hidden="true">↓</span
+              ></md-outlined-button
+            >
+          </div>
+        </div>
+        <div class="hero-sketch" aria-hidden="true">
+          <div class="hero-orbit orbit-one"></div><div
+            class="hero-orbit orbit-two"
+          >
+          </div><div class="hero-cross">
+            <IterationIcon shape="circle-square" />
+          </div><span class="hero-scribble scribble-a reveal">try / 01</span
+          ><span class="hero-scribble scribble-b reveal">keep? / 03</span>
+        </div>
+        <div class="hero-bottom annotation reveal">
+          <span>notebook open / work in progress</span><span
+            >scroll to investigate ↓</span
+          >
+        </div>
       </section>
-      <section class="statement shell section-rule" aria-labelledby="space-title">
+      <section
+        class="statement shell section-rule"
+        aria-labelledby="space-title"
+      >
         <div class="section-index reveal">02 / protected space</div>
-        <div class="statement-content"><h2 id="space-title" class="reveal">Exploratory code needs room to breathe.</h2><p class="reveal">Polished project code asks for certainty. An experiment asks a better question: <em>what happens if I try this?</em> Sketch Kit lives alongside your project, giving a sketch its own JavaScript and SCSS files so you can test an idea without dragging the whole application into it.</p><p class="margin-note reveal">// isolate the question<br />// follow the interesting result</p></div>
+        <div class="statement-content">
+          <h2 id="space-title" class="reveal">
+            Exploratory code needs room to breathe.
+          </h2><p class="reveal">
+            Polished project code asks for certainty. An experiment asks a
+            better question: <em>what happens if I try this?</em> Sketch Kit lives
+            alongside your project, giving a sketch its own JavaScript and SCSS files
+            so you can test an idea without dragging the whole application into it.
+          </p><p class="margin-note reveal">
+            // isolate the question<br />// follow the interesting result
+          </p>
+        </div>
       </section>
-      <section id="method" class="method section-rule" aria-labelledby="method-title">
-        <div class="shell"><div class="section-index reveal">03 / working method</div><div class="method-intro"><h2 id="method-title" class="reveal">Iteration is the feature.</h2><p class="reveal">Make one thing. Look at it. Copy the version that still has promise, change a single part, and compare. Keep the trail visible.</p></div>
+      <section
+        id="method"
+        class="method section-rule"
+        aria-labelledby="method-title"
+      >
+        <div class="shell">
+          <div class="section-index reveal">03 / working method</div><div
+            class="method-intro"
+          >
+            <h2 id="method-title" class="reveal">
+              Iteration is the feature.
+            </h2><p class="reveal">
+              Make one thing. Look at it. Copy the version that still has
+              promise, change a single part, and compare. Keep the trail
+              visible.
+            </p>
+          </div>
           <ol class="method-steps" aria-label="Sketch Kit iteration workflow">
-            <li class="reveal"><span>01</span><strong>Create</strong><small>start a sketch</small></li><li class="reveal"><span>02</span><strong>Play</strong><small>see what moves</small></li><li class="reveal"><span>03</span><strong>Copy</strong><small>save this state</small></li><li class="reveal"><span>04</span><strong>Change</strong><small>push one idea</small></li><li class="reveal"><span>05</span><strong>Compare</strong><small>look back</small></li><li class="reveal"><span>06</span><strong>Keep</strong><small>carry it forward</small></li>
+            <li class="reveal">
+              <span>01</span><strong>Create</strong><small>start a sketch</small
+              >
+            </li><li class="reveal">
+              <span>02</span><strong>Play</strong><small>see what moves</small>
+            </li><li class="reveal">
+              <span>03</span><strong>Copy</strong><small>save this state</small>
+            </li><li class="reveal">
+              <span>04</span><strong>Change</strong><small>push one idea</small>
+            </li><li class="reveal">
+              <span>05</span><strong>Compare</strong><small>look back</small>
+            </li><li class="reveal">
+              <span>06</span><strong>Keep</strong><small>carry it forward</small
+              >
+            </li>
           </ol>
         </div>
       </section>
-      <section class="how shell section-rule" aria-labelledby="how-title"><div class="section-index reveal">04 / under the hood</div><div class="how-body"><h2 id="how-title" class="reveal">A sketchbook that runs.</h2><div class="how-grid"><div><span class="annotation reveal">// 01 — beside the project</span><p class="reveal"><code>sketch-kit init</code> creates a dedicated <code>sketch-kit/</code> workspace alongside your application.</p></div><div><span class="annotation reveal">// 02 — one sketch at a time</span><p class="reveal"><code>sketch-kit create motion</code> generates a JavaScript sketch and its SCSS file. Select a sketch to render it in the browser.</p></div><div><span class="annotation reveal">// 03 — branch the idea</span><p class="reveal">Copying an existing sketch creates a numbered iteration. The earlier version stays there to compare against.</p></div><div><span class="annotation reveal">// 04 — fast feedback</span><p class="reveal"><code>sketch-kit run</code> starts a Vite dev server with hot updates. <code>sketch-kit build</code> produces a static build.</p></div></div></div></section>
-      <section id="demo" class="demo-section section-rule"><div class="shell"><div class="section-index reveal">05 / experiment no. 003</div><div class="demo-heading"><div><h2 class="reveal">One idea, three passes.</h2><p class="reveal">Click through a tiny motion study. Each revision keeps the previous thought available while changing the shape of the next one.</p></div><span class="annotation reveal">// tap a number to compare</span></div><iteration-demo class="reveal"><div class="demo-fallback">Revision 01: one circle. Revision 02: copy and offset it. Revision 03: change the rhythm. Enable JavaScript to compare the illustrations.</div></iteration-demo></div></section>
-      <section id="install" class="install shell section-rule" aria-labelledby="install-title"><div class="section-index reveal">06 / take it for a spin</div><div class="install-body"><h2 id="install-title" class="reveal">Open a new page.</h2><p class="reveal">Install Sketch Kit, initialize a workspace in your project, then start sketching. The repository has the CLI source, usage notes and current roadmap.</p><div class="terminal" aria-label="Installation commands"><div class="terminal-header reveal"><span>terminal / quick start</span><span>↘</span></div><pre class="reveal"><code><span>$</span> npm install -g sketch-kit
+      <section class="how shell section-rule" aria-labelledby="how-title">
+        <div class="section-index reveal">04 / under the hood</div><div
+          class="how-body"
+        >
+          <h2 id="how-title" class="reveal">A sketchbook that runs.</h2><div
+            class="how-grid"
+          >
+            <div>
+              <span class="annotation reveal">// 01 — beside the project</span
+              ><p class="reveal">
+                <code>sketch-kit init</code> creates a dedicated <code
+                  >sketch-kit/</code
+                > workspace alongside your application.
+              </p>
+            </div><div>
+              <span class="annotation reveal">// 02 — one sketch at a time</span
+              ><p class="reveal">
+                <code>sketch-kit create motion</code> generates a JavaScript sketch
+                and its SCSS file. Select a sketch to render it in the browser.
+              </p>
+            </div><div>
+              <span class="annotation reveal">// 03 — branch the idea</span><p
+                class="reveal"
+              >
+                Copying an existing sketch creates a numbered iteration. The
+                earlier version stays there to compare against.
+              </p>
+            </div><div>
+              <span class="annotation reveal">// 04 — fast feedback</span><p
+                class="reveal"
+              >
+                <code>sketch-kit run</code> starts a Vite dev server with hot updates.
+                <code>sketch-kit build</code> produces a static build.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="demo" class="demo-section section-rule">
+        <div class="shell">
+          <div class="section-index reveal">05 / experiment no. 003</div><div
+            class="demo-heading"
+          >
+            <div>
+              <h2 class="reveal">One idea, three passes.</h2><p class="reveal">
+                Click through a tiny motion study. Each revision keeps the
+                previous thought available while changing the shape of the next
+                one.
+              </p>
+            </div><span class="annotation reveal"
+              >// tap a number to compare</span
+            >
+          </div><iteration-demo class="reveal"
+            ><div class="demo-fallback">
+              Revision 01: one circle. Revision 02: copy and offset it. Revision
+              03: change the rhythm. Enable JavaScript to compare the
+              illustrations.
+            </div></iteration-demo
+          >
+        </div>
+      </section>
+      <section
+        id="install"
+        class="install shell section-rule"
+        aria-labelledby="install-title"
+      >
+        <div class="section-index reveal">06 / take it for a spin</div><div
+          class="install-body"
+        >
+          <h2 id="install-title" class="reveal">Open a new page.</h2><p
+            class="reveal"
+          >
+            Install Sketch Kit, initialize a workspace in your project, then
+            start sketching. The repository has the CLI source, usage notes and
+            current roadmap.
+          </p><div class="terminal" aria-label="Installation commands">
+            <div class="terminal-header reveal">
+              <span>terminal / quick start</span><span>↘</span>
+            </div><pre
+              class="reveal"><code><span>$</span> npm install -g sketch-kit
 <span>$</span> sketch-kit init
 <span>$</span> sketch-kit create first-idea
-<span>$</span> sketch-kit run</code></pre></div><a class="action-primary install-link reveal" href={github}>View Sketch Kit on GitHub <span aria-hidden="true">↗</span></a><p class="install-note reveal">// Sketch Kit is an open-source project. Read the repository before you begin.</p></div></section>
+<span>$</span> sketch-kit run</code></pre>
+          </div>
+          <md-filled-button class="reveal" href={github}
+            >View Sketch Kit on GitHub <span aria-hidden="true">↗</span
+            ></md-filled-button
+          >
+          <p class="install-note reveal">
+            // Sketch Kit is an open-source project. Read the repository before
+            you begin.
+          </p>
+        </div>
+      </section>
     </main>
-    <footer class="site-footer shell"><a class="wordmark reveal" href="#top"><span class="wordmark-mark"><IterationIcon shape="circle-square" /></span> sketch kit<span class="wordmark-period">.</span></a><p class="reveal">Make a mess. Keep the good parts.</p><a class="reveal" href={github}>source / GitHub ↗</a><span class="annotation reveal">revision 001 / website</span></footer>
-    <script>
-      import '../components/iteration-demo';
-      import '../scripts/text-reveals';
+    <footer class="site-footer shell">
+      <a class="wordmark reveal" href="#top"
+        ><span class="wordmark-mark"
+          ><IterationIcon shape="circle-square" /></span
+        > sketch kit<span class="wordmark-period">.</span>
+      </a>
+      <p class="reveal">Make a mess. Keep the good parts.</p>
+      <a class="reveal" href={personalSite}>kevinmayo.com ↗</a>
+      <a class="reveal" href={github}>source / GitHub ↗</a>
+      <span class="annotation reveal">revision 001 / website</span>
+    </footer>
+    <script type="module">
+      import '@material/web/button/text-button.js';
+      import '@material/web/button/filled-button.js';
+      import '@material/web/button/outlined-button.js';
+      import "../components/iteration-demo";
+      import "../scripts/text-reveals";
     </script>
   </body>
 </html>

@@ -19,7 +19,7 @@ export class IterationDemo extends LitElement {
   static styles = css`
     :host {
       display: block;
-      color: var(--ink);
+      color: var(--md-sys-color-on-surface);
       font-family: var(--font-text);
     }
 
@@ -28,8 +28,8 @@ export class IterationDemo extends LitElement {
     }
 
     .demo {
-      border: 1px solid var(--outline);
-      background: var(--surface);
+      border: 1px solid var(--md-sys-color-outline);
+      background: var(--md-sys-color-surface);
     }
 
     .bar {
@@ -37,14 +37,14 @@ export class IterationDemo extends LitElement {
       justify-content: space-between;
       gap: 1rem;
       padding: .85rem 1rem;
-      border-bottom: 1px solid var(--outline);
+      border-bottom: 1px solid var(--md-sys-color-outline);
       font: 600 .72rem/1.4 var(--font-code);
       letter-spacing: .08em;
       text-transform: uppercase;
     }
 
     .bar span:last-child {
-      color: var(--muted);
+      color: var(--md-sys-color-on-surface-variant);
     }
 
     .body {
@@ -59,10 +59,10 @@ export class IterationDemo extends LitElement {
       display: grid;
       place-items: center;
       min-height: 350px;
-      background-color: var(--paper);
-      background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+      background-color: var(--md-sys-color-surface);
+      background-image: linear-gradient(var(--md-sys-color-outline-variant) 1px, transparent 1px), linear-gradient(90deg, var(--md-sys-color-outline-variant) 1px, transparent 1px);
       background-size: 24px 24px;
-      border-right: 1px solid var(--outline);
+      border-right: 1px solid var(--md-sys-color-outline);
     }
 
     .canvas::after {
@@ -70,7 +70,7 @@ export class IterationDemo extends LitElement {
       position: absolute;
       left: 1rem;
       bottom: 1rem;
-      color: var(--muted);
+      color: var(--md-sys-color-on-surface-variant);
       font: .7rem var(--font-code);
     }
 
@@ -86,7 +86,7 @@ export class IterationDemo extends LitElement {
       position: absolute;
       width: var(--size);
       height: var(--size);
-      border: 3px solid var(--signal);
+      border: 3px solid var(--md-sys-color-primary);
       border-radius: 50%;
       left: 49px;
       top: 52px;
@@ -112,7 +112,7 @@ export class IterationDemo extends LitElement {
       position: absolute;
       width: 18px;
       height: 18px;
-      color: var(--ink);
+      color: var(--md-sys-color-on-surface);
       left: 87px;
       top: 90px;
     }
@@ -124,7 +124,7 @@ export class IterationDemo extends LitElement {
     }
 
     .label {
-      color: var(--muted);
+      color: var(--md-sys-color-on-surface-variant);
       font: .7rem var(--font-code);
       text-transform: uppercase;
       letter-spacing: .08em;
@@ -137,20 +137,20 @@ export class IterationDemo extends LitElement {
 
     .note {
       margin: 0;
-      color: var(--muted);
+      color: var(--md-sys-color-on-surface-variant);
       font: .85rem/1.5 var(--font-code);
     }
 
     .code {
       margin: 1.5rem 0 auto;
       padding: 1rem;
-      border: 1px solid var(--outline);
+      border: 1px solid var(--md-sys-color-outline);
       white-space: pre-wrap;
       font: .8rem/1.65 var(--font-code);
     }
 
     .code b {
-      color: var(--signal);
+      color: var(--md-sys-color-primary);
       font-weight: 600;
     }
 
@@ -167,28 +167,28 @@ export class IterationDemo extends LitElement {
       gap: .35rem;
       flex: 1;
       padding: .8rem .25rem;
-      border: 1px solid var(--outline);
+      border: 1px solid var(--md-sys-color-outline);
       border-radius: var(--shape-small);
-      background: var(--surface);
-      color: var(--ink);
+      background: var(--md-sys-color-surface);
+      color: var(--md-sys-color-on-surface);
       cursor: pointer;
       font: 600 .76rem var(--font-code);
       transition: background .18s, color .18s;
     }
 
     button:hover {
-      background: var(--signal-soft);
+      background: var(--md-sys-color-primary-container);
     }
 
     button:focus-visible {
-      outline: 3px solid var(--signal);
+      outline: 3px solid var(--md-sys-color-primary);
       outline-offset: 2px;
     }
 
     button[aria-pressed='true'] {
-      background: var(--signal);
-      border-color: var(--signal);
-      color: var(--on-signal);
+      background: var(--md-sys-color-primary);
+      border-color: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
     }
 
     @media (max-width: 720px) {
@@ -198,7 +198,7 @@ export class IterationDemo extends LitElement {
 
       .canvas {
         border-right: 0;
-        border-bottom: 1px solid var(--outline);
+        border-bottom: 1px solid var(--md-sys-color-outline);
         min-height: 270px;
       }
 
