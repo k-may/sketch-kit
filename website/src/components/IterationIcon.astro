@@ -1,0 +1,26 @@
+---
+import square from '../assets/iteration-square.svg?url';
+import circle from '../assets/iteration-circle.svg?url';
+import circleSquare from '../assets/iteration-circle-square.svg?url';
+
+interface Props {
+  shape?: 'square' | 'circle' | 'circle-square';
+}
+
+const { shape = 'square' } = Astro.props;
+const icons = { square, circle, 'circle-square': circleSquare };
+---
+
+<span class="iteration-icon" style={`--icon: url("${icons[shape]}")`} aria-hidden="true"></span>
+
+<style>
+  .iteration-icon {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    flex-shrink: 0;
+    background-color: currentColor;
+    mask: var(--icon) center / contain no-repeat;
+    vertical-align: middle;
+  }
+</style>

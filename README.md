@@ -90,37 +90,28 @@ Each sketch exposes a interface for commonly used methods, the most important be
 
 `sketch-kit init`
 
-This command will add a 'sketches' folder to the root of your directory. Inside you'll find :
+This command will add a 'sketch-kit' folder to the root of your directory. Inside you'll find :
 
 ```
-sketches/
---------/assets
---------/css
---------/data
---------/js
---------/--------/main.js
---------/--------/sketches.js
---------/--------/utils
---------/--------/views
---------/--------/--------/components
---------/--------/--------/sketches
---------/node_modules (optional)
---------/scss
---------/--------/sketches
---------/index.html
---------/sketch-kit.config.json
+sketch-kit/
+|-- assets/
+|-- css/
+|-- js/
+|-- scss/
+|-- index.html
+`-- sketch-kit.config.json
 ```
 
 **Options**
 
 - Project Name. _Name for the project (basically becomes the title for the rendered page)._
-- Copy Node Dependencies. _sketch-kit will automatically copy all dependencies from your project.json, making them available to your sketches (note: js modules only)._
+Sketch Kit copies its workspace template; it does not copy dependencies from your project.
 
 ### Run
 
 `sketch-kit run`
 
-sketch-kit will start up browser-sync and the watch tasks for your scss.
+sketch-kit starts a Vite development server with HMR on port 3002. Vite handles SCSS updates.
 
 
 ### Create
@@ -143,15 +134,7 @@ sketch-kit will create a `build/` folder containing a static build of the projec
 
 ### Global Options
 
-~~_configFile_~~ NO LONGER SUPPORTED
-
-Define an alternative config file for different distributions.
-
-`sketch-kit run --configFile alt.config.json`
-
-If the sketch already exists, you'll be prompted to copy or replace, creating a new nested iteration.
-
-The base sketch-kit.config.json defines the sketches which are visible while running sketch-kit, and provides a target for adding new sketches.
+`--configFile alt.config.json` selects another config file inside `sketch-kit/` after initialization. If that file is missing, Sketch Kit falls back to the default config.
 
 ## License
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fk-may%2Fsketch-kit.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fk-may%2Fsketch-kit?ref=badge_large)
