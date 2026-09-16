@@ -1,6 +1,7 @@
 ---
 import "../styles/site.css";
 import "../styles/material-theme/css/light.css";
+import "../styles/material-theme/css/dark.css";
 import IterationIcon from "../components/IterationIcon.astro";
 
 const github = "https://github.com/k-may/sketch-kit";
@@ -8,6 +9,8 @@ const personalSite = "https://kevinmayo.com";
 const title = "Sketch Kit — make a mess. Keep the good parts.";
 const description =
   "Sketch Kit is a rapid prototyping environment for expressive JavaScript. Create, play, copy, change, compare and keep your best sketches.";
+
+const mode = "dark";
 ---
 
 <!doctype html>
@@ -21,13 +24,20 @@ const description =
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <title>{title}</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+      rel="stylesheet"
+    />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
- <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Major+Mono+Display&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Major+Mono+Display&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+      rel="stylesheet"
+    />
   </head>
-  <body class="light">
+  <body class={mode}>
     <a class="skip" href="#main">Skip to content</a>
     <header class="site-header shell">
       <a class="wordmark reveal" href="#top" aria-label="Sketch Kit home"
@@ -43,6 +53,18 @@ const description =
         <md-text-button class="nav-github" href={github}
           >GitHub ↗</md-text-button
         >
+        <md-icon-button
+          class="button--dark_mode"
+          onclick="document.body.classList.toggle('dark'); document.body.classList.toggle('light');"
+        >
+          <md-icon>dark_mode</md-icon>
+        </md-icon-button>
+        <md-icon-button
+          class="button--light_mode"
+          onclick="document.body.classList.toggle('dark'); document.body.classList.toggle('light');"
+        >
+          <md-icon>light_mode</md-icon>
+        </md-icon-button>
       </nav>
     </header>
     <main id="main">
@@ -127,9 +149,7 @@ const description =
             to decide too early—to describe exactly what you want, then ask an
             agent to make sweeping changes to the real codebase.
           </p>
-          <p class="reveal">
-            Creative work rarely begins with that certainty.
-          </p>
+          <p class="reveal">Creative work rarely begins with that certainty.</p>
           <p class="reveal">
             Sketch Kit offers another approach: ask an agent to build several
             small possibilities. Try different interactions, structures or
@@ -143,9 +163,9 @@ const description =
             thinking.
           </p>
           <p class="reveal">
-            The developer’s role is not simply to specify the correct answer
-            in advance. It is to create the conditions in which better answers
-            can be discovered.
+            The developer’s role is not simply to specify the correct answer in
+            advance. It is to create the conditions in which better answers can
+            be discovered.
           </p>
           <p class="reveal">
             <strong>Don’t ask an agent for one big answer.</strong><br />
@@ -296,9 +316,11 @@ const description =
       <span class="annotation reveal">revision 001 / website</span>
     </footer>
     <script type="module">
-      import '@material/web/button/text-button.js';
-      import '@material/web/button/filled-button.js';
-      import '@material/web/button/outlined-button.js';
+      import "@material/web/button/text-button.js";
+      import "@material/web/button/filled-button.js";
+      import "@material/web/iconbutton/icon-button.js";
+      import "@material/web/button/outlined-button.js";
+      import "@material/web/icon/icon.js";
       import "../components/iteration-demo";
       import "../scripts/text-reveals";
     </script>

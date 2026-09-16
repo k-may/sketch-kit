@@ -33,6 +33,14 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+body.light nav .button--light_mode{
+  display: none;
+}
+
+body.dark nav .button--dark_mode{
+  display: none;
+}
+
 ::selection {
   background: var(--md-sys-color-primary);
   color: var(--md-sys-color-on-primary);
