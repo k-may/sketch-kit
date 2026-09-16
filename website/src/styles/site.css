@@ -23,6 +23,8 @@
 
 html {
   scroll-behavior: smooth;
+    scrollbar-width: thin;
+  scrollbar-color: #445E91 black;
 }
 
 body {
@@ -31,6 +33,8 @@ body {
   color: var(--md-sys-color-on-surface);
   font-family: var(--font-text);
   -webkit-font-smoothing: antialiased;
+
+
 }
 
 body.light nav .button--light_mode{
