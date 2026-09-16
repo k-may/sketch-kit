@@ -24,7 +24,7 @@
 html {
   scroll-behavior: smooth;
     scrollbar-width: thin;
-  scrollbar-color: #445E91 black;
+  scrollbar-color: #445E91 transparent;
 }
 
 body {
