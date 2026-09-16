@@ -17,7 +17,7 @@ function displayHelp() {
 }
 
 
-function main() {
+async function main() {
     var argv = minimist(process.argv.slice(2), {
         string: ['configFile'],
         alias: {
@@ -44,19 +44,19 @@ function main() {
 
         switch (action) {
             case 'create':
-                s.create(args);
+                await s.create(args);
                 break;
             case 'run':
-                s.run(args, context);
+                await s.run(args, context);
                 break;
             case 'init':
-                s.init(args);
+                await s.init(args);
                 break;
             case 'build':
-                s.build(args);
+                await s.build(args);
                 break;
             case 'preview':
-                s.preview(args);
+                await s.preview(args);
                 break;
             default :
                 displayHelp();
@@ -66,4 +66,7 @@ function main() {
     }
 }
 
-main();
+main().catch(error => {
+    console.error(error.message);
+    process.exitCode = 1;
+});

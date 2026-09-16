@@ -32,9 +32,26 @@ Rapid prototyping framework for HTML5 projects
 
 To help speed up the process of creating and running small experiments and prototypes I've developed some tools which I believe take much of the pain out of the experience.
 
-The idea being; the more time one can spend on the fun bits (vs the boring dev-ops bits) the better and more expressive prototyping can be.
+**Exploratory code needs room to breathe.**
 
-Sketch-Kit is designed to live along-side your project (a sketch-kit/ folder will exist in the project root), to provide a sand-box infrastructure where you can work through solutions. Sketch-Kit is ideal for :
+Polished project code asks for certainty. An experiment asks a better question: what happens if I try this? Sketch Kit lives alongside your project, giving a sketch its own JavaScript and SCSS files so you can test an idea without dragging the whole application into it.
+
+**When code becomes cheap, explore more**
+
+Agentic programming makes it possible to produce working code at extraordinary speed. But faster implementation can create pressure to decide too early—to describe exactly what you want, then ask an agent to make sweeping changes to the real codebase.
+
+Creative work rarely begins with that certainty.
+
+Sketch Kit offers another approach: ask an agent to build several small possibilities. Try different interactions, structures or visual behaviours without requiring any of them to becomethe solution. Run them. Compare them. Change the promising ones. Forget the rest.
+
+When the cost of writing code falls, code no longer needs to be treated as a precious final product. It can become a material for thinking.
+
+The developer’s role is not simply to specify the correct answer in advance. It is to create the conditions in which better answers can be discovered.
+
+Don’t ask an agent for one big answer.
+Give it room to make many small suggestions.
+
+Sketch-Kit is ideal for :
 - **Experimenting** with js libraries used in your project code
 - **Nuancing transitions** (without having to navigate and potentially contaminate project code)
 - **Sharing** code examples with your team
@@ -44,7 +61,7 @@ Sketch-Kit is designed to live along-side your project (a sketch-kit/ folder wil
 ### Built With
 
 - [vite](https://vitejs.dev/) (HMR, development, building)
-- [glslify](https://github.com/glslify/glslify)
+- [lit](https://lit.dev/) (web components)
 - sass
 
 ![alt text](https://github.com/k-may/sketch-kit/raw/master/design/Screenshot%202022-06-01%20113728.png "Screen Grab")

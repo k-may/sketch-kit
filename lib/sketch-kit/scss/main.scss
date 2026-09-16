@@ -1,7 +1,10 @@
-@import "mixins";
-@import "reset";
-@import "menu";
-@import "sketches/SketchKit.scss";
+// code-in: sketch-styles
+@use "sketches/SketchKit" as sketch_SketchKit;
+// code-out: sketch-styles
+
+@use "mixins";
+@use "reset";
+@use "menu";
 
 :root {
   font-size: 16px;
@@ -25,7 +28,7 @@ body {
   padding: 0;
   overflow-x:hidden;
 
-  @include scroll-styles;
+  @include mixins.scroll-styles;
 }
 
 body.fullscreen{
@@ -61,11 +64,11 @@ footer {
     padding: 9px;
     cursor: pointer;
     white-space: nowrap;
-    color: $grey;
+    color: menu.$grey;
     font-family: "Major Mono Display";
 
     &:hover {
-      color: $pink;
+      color: menu.$pink;
     }
   }
 }
@@ -132,5 +135,4 @@ footer {
 }
 
 
-//DON'T EDIT IMPORTS BELOW!
-//todo add 'code in' and 'code out' directives here
+

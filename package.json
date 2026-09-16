@@ -11,7 +11,12 @@
   "scripts": {
     "start": "node index.js",
     "test": "mocha 'test/**/*.js'",
-    "clean": "rimraf sketch-kit"
+    "clean": "rimraf sketch-kit",
+    "test:registry": "node --test test/registry.test.mjs",
+    "smoke": "node scripts/smoke.mjs",
+    "smoke:setup": "node scripts/smoke.mjs setup",
+    "smoke:purge": "node scripts/smoke.mjs purge",
+    "test:smoke": "node --test test/smoke.test.mjs"
   },
   "repository": {
     "type": "git",

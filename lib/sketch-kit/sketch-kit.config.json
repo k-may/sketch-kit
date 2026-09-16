@@ -2,9 +2,14 @@
   "sketches": {
     "SketchKit": {
       "date": "",
-      "author": "kevma"
+      "author": "kevma",
+      "parentId": null,
+      "order": 1,
+      "nextOrder": 1
     }
   },
   "include_modules": true,
-  "project": ""
+  "project": "",
+  "schemaVersion": 2,
+  "nextRootOrder": 2
 }
