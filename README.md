@@ -1,5 +1,5 @@
 
-![alt text](sketch-kit.png "Logo Title Text 1")
+![alt text](sketch-kit.webp "Logo Title Text 1")
 
 [![Node CI](https://github.com/k-may/sketch-kit/actions/workflows/nodejs.yml/badge.svg)](https://github.com/k-may/sketch-kit/actions/workflows/nodejs.yml)
 

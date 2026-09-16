@@ -1,0 +1,93 @@
+@use "sass:list";
+@use "sass:math";
+
+// Sprite: 270 x 337, with 66.904px cells starting at (1.064, 1.064).
+// triangle_1 has its right angle bottom-left; triangle_2 top-right.
+$shapes: square, circle, triangle_1, triangle_2;
+$cell: 66.904;
+$origin: 1.064;
+$branch-colors: #3a6361, #e8acc8, #36588a, #bc9249;
+
+@mixin column($index) {
+  --icon-column: #{math.div(-($origin + $index * $cell), $cell)};
+}
+
+@mixin row($index) {
+  --icon-row: #{math.div(-($origin + $index * $cell), $cell)};
+}
+
+.icon {
+  display: inline-block;
+  box-sizing: border-box;
+  --icon-size:14px;
+  flex: 0 0 var(--icon-size, 24px);
+  width: var(--icon-size, 24px);
+  height: var(--icon-size, 24px);
+  min-width: var(--icon-size, 24px);
+  max-width: var(--icon-size, 24px);
+  min-height: var(--icon-size, 24px);
+  max-height: var(--icon-size, 24px);
+  padding: 0;
+  border: 0;
+  vertical-align: middle;
+  background-color: currentColor;//var(--branch-color, currentColor);
+
+  -webkit-mask-image: url("../assets/sk-icons.svg");
+  mask-image: url("../assets/sk-icons.svg");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size:
+    calc(var(--icon-size, 24px) * #{math.div(270, $cell)})
+    calc(var(--icon-size, 24px) * #{math.div(337, $cell)});
+  mask-size:
+    calc(var(--icon-size, 24px) * #{math.div(270, $cell)})
+    calc(var(--icon-size, 24px) * #{math.div(337, $cell)});
+  -webkit-mask-position:
+    calc(var(--icon-size, 24px) * var(--icon-column, #{math.div(-$origin, $cell)}))
+    calc(var(--icon-size, 24px) * var(--icon-row, #{math.div(-$origin, $cell)}));
+  mask-position:
+    calc(var(--icon-size, 24px) * var(--icon-column, #{math.div(-$origin, $cell)}))
+    calc(var(--icon-size, 24px) * var(--icon-row, #{math.div(-$origin, $cell)}));
+}
+
+// Automatic menu mapping. Only roots set the column: all descendants inherit it.
+// Each nested sibling list restarts the four inner shapes at square.
+@for $index from 1 through list.length($shapes) {
+  :where(nav > div > ul > li:nth-of-type(4n + #{$index})) {
+    @include column($index - 1);
+
+    > .sketch > .icon {
+      @include row(0);
+    }
+  }
+
+  :where(nav > div > ul ul > li:nth-of-type(4n + #{$index}) > .sketch > .icon) {
+    @include row($index);
+  }
+}
+
+// Every branch list shares a colour determined by its parent's sibling index.
+// Nested groups repeat this palette; colours are not globally unique IDs.
+@for $index from 1 through list.length($branch-colors) {
+  nav > div > ul li:nth-of-type(4n + #{$index}) > ul {
+    --branch-color: var(--branch-color-#{$index}, #{list.nth($branch-colors, $index)});
+  }
+}
+
+// Explicit classes override automatic mapping when needed.
+// Examples: icon icon--square / icon icon--square_circle.
+@for $outer from 1 through list.length($shapes) {
+  $name: list.nth($shapes, $outer);
+
+  .icon.icon--#{$name} {
+    @include column($outer - 1);
+    @include row(0);
+  }
+
+  @for $inner from 1 through list.length($shapes) {
+    .icon.icon--#{$name}_#{list.nth($shapes, $inner)} {
+      @include column($outer - 1);
+      @include row($inner);
+    }
+  }
+}
