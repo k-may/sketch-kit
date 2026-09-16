@@ -6,7 +6,7 @@
   --shape-small: var(--md-sys-shape-corner-extra-small);
   --font-display: "Major Mono Display", "Courier New", monospace;
   --font-text: "Inter", Arial, sans-serif;
-  --font-code: "Major Mono Display", "Courier New", Consolas, monospace;
+  --font-code: "Space Mono", monospace, "Courier New", Consolas, monospace;
 }
 
 :root {
@@ -70,10 +70,10 @@ a:focus-visible, button:focus-visible {
 }
 
 .annotation, .section-index, .margin-note, .install-note {
-  font: .7rem/1.5 var(--font-code);
+  font: 400 .7rem/1.5 var(--font-code);
   letter-spacing: .04em;
-  text-transform: lowercase;
-  font-weight: 800;
+  text-transform: uppercase;
+  /* font-weight: 800; */
 }
 
 .annotation {
@@ -204,8 +204,8 @@ code {
   display: flex;
   align-items: center;
   gap: .65rem;
-  font: 600 .72rem var(--font-code);
-  text-transform: lowercase;
+  font: 300 .72rem var(--font-code);
+  text-transform: uppercase;
   letter-spacing: .06em;
   margin-bottom: 2.6rem;
 }
@@ -435,10 +435,9 @@ h1 span {
 }
 
 .method-steps span, .method-steps small {
-  font: .68rem var(--font-code);
+  font: 400 .68rem var(--font-code);
   color: var(--md-sys-color-inverse-on-surface);
   opacity: .76;
-  font-weight: 800;
 }
 
 .method-steps strong {

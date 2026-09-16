@@ -38,7 +38,7 @@ export class IterationDemo extends LitElement {
       gap: 1rem;
       padding: .85rem 1rem;
       border-bottom: 1px solid var(--md-sys-color-outline);
-      font: 600 .72rem/1.4 var(--font-code);
+      font: 400 .72rem/1.4 var(--font-code);
       letter-spacing: .08em;
       text-transform: uppercase;
     }
