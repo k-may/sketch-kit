@@ -3,6 +3,7 @@ import "../styles/site.css";
 import "../styles/material-theme/css/light.css";
 import "../styles/material-theme/css/dark.css";
 import IterationIcon from "../components/IterationIcon.astro";
+import Header from "../components/Header.astro";
 
 const github = "https://github.com/k-may/sketch-kit";
 const personalSite = "https://kevinmayo.com";
@@ -11,6 +12,8 @@ const description =
   "Sketch Kit is a rapid prototyping environment for expressive JavaScript. Create, play, copy, change, compare and keep your best sketches.";
 
 const mode = "dark";
+
+
 ---
 
 <!doctype html>
@@ -52,36 +55,12 @@ const mode = "dark";
     <meta name="apple-mobile-web-app-title" content="sketchkit" />
     <link rel="manifest" href="/assets/icons/site.webmanifest" />
   </head>
-  <body class={mode}>
+<body class={`${mode}`}>
+    
     <a class="skip" href="#main">Skip to content</a>
-    <header class="site-header shell">
-      <a class="wordmark reveal" href="#top" aria-label="Sketch Kit home"
-        ><span class="wordmark-mark"
-          ><IterationIcon shape="circle-square" /></span
-        > sketch kit<span class="wordmark-period">.</span></a
-      >
-      <nav aria-label="Main navigation" class="reveal">
-        <md-text-button href="#method">method</md-text-button>
-        <md-text-button href="#demo">iterations</md-text-button>
-        <md-text-button href="#install">install</md-text-button>
-        <md-text-button href={personalSite}>kevinmayo.com ↗</md-text-button>
-        <md-text-button class="nav-github" href={github}
-          >GitHub ↗</md-text-button
-        >
-        <md-icon-button
-          class="button--dark_mode"
-          onclick="document.body.classList.toggle('dark'); document.body.classList.toggle('light');"
-        >
-          <md-icon>dark_mode</md-icon>
-        </md-icon-button>
-        <md-icon-button
-          class="button--light_mode"
-          onclick="document.body.classList.toggle('dark'); document.body.classList.toggle('light');"
-        >
-          <md-icon>light_mode</md-icon>
-        </md-icon-button>
-      </nav>
-    </header>
+
+    <Header personalSite={personalSite} github={github} />
+
     <main id="main">
       <section id="top" class="hero shell" aria-labelledby="hero-title">
         <div class="hero-top annotation reveal">

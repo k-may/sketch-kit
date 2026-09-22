@@ -1,0 +1,72 @@
+---
+import IterationIcon from "../components/IterationIcon.astro";
+const { personalSite, github } = Astro.props;
+---
+
+<header class="site-header shell">
+  <a class="wordmark reveal" href="#top" aria-label="Sketch Kit home"
+    ><span class="wordmark-mark"><IterationIcon shape="circle-square" /></span> sketch
+    kit<span class="wordmark-period">.</span></a
+  >
+  <nav aria-label="Main navigation" class="reveal">
+    <md-text-button href="#method">method</md-text-button>
+    <md-text-button href="#demo">iterations</md-text-button>
+    <md-text-button href="#install">install</md-text-button>
+    <md-text-button href={personalSite}>kevinmayo.com ↗</md-text-button>
+    <md-text-button class="nav-github" href={github}>GitHub ↗</md-text-button>
+    <md-icon-button
+      class="button--dark_mode"
+      onclick="document.body.classList.toggle('dark'); document.body.classList.toggle('light');"
+    >
+      <md-icon>dark_mode</md-icon>
+    </md-icon-button>
+    <md-icon-button
+      class="button--light_mode"
+      onclick="document.body.classList.toggle('dark'); document.body.classList.toggle('light');"
+    >
+      <md-icon>light_mode</md-icon>
+    </md-icon-button>
+  </nav>
+
+  <nav class="mobile">
+
+    <md-icon-button
+      class="button--dark_mode"
+      onclick="document.body.classList.toggle('dark'); document.body.classList.toggle('light');"
+    >
+      <md-icon>dark_mode</md-icon>
+    </md-icon-button>
+    <md-icon-button
+      class="button--light_mode"
+      onclick="document.body.classList.toggle('dark'); document.body.classList.toggle('light');"
+    >
+      <md-icon>light_mode</md-icon>
+    </md-icon-button>
+        <md-icon-button
+      onclick="document.body.classList.toggle('mobile-menu-active');"
+    >
+      <md-icon>menu</md-icon>
+    </md-icon-button>
+  </nav>
+
+  <div class="mobile-menu">
+    <nav>
+      <a class="wordmark reveal" href="#top" aria-label="Sketch Kit home"
+        ><span class="wordmark-mark"
+          ><IterationIcon shape="circle-square" /></span
+        > sketch kit<span class="wordmark-period">.</span></a
+      >
+      
+      <md-icon-button
+        onclick="document.body.classList.toggle('mobile-menu-active');"
+      >
+        <md-icon>close</md-icon>
+      </md-icon-button>
+    </nav>
+    <md-text-button href="#method">method</md-text-button>
+    <md-text-button href="#demo">iterations</md-text-button>
+    <md-text-button href="#install">install</md-text-button>
+    <md-text-button href={personalSite}>kevinmayo.com ↗</md-text-button>
+    <md-text-button class="nav-github" href={github}>GitHub ↗</md-text-button>
+  </div>
+</header>
