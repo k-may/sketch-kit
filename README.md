@@ -83,7 +83,9 @@ Sketch-Kit is ideal for :
 
 ## Setup
 
-Each '_sketch_' gets a javascript file and scss file generated on creation.
+Each sketch gets a JavaScript file and SCSS file together in `js/sketches/<name>/`.
+The JavaScript imports `./<name>.scss`, so Vite handles style loading and updates.
+See [sketch styles and migration](docs/sass.md) for existing workspaces.
 
 When the sketch is selected from the menu (top left, very discrete) the js for the sketch is imported and attached to a dom element on the page. This element is exposed as `this.el`.
 
@@ -100,6 +102,15 @@ Each sketch exposes a interface for commonly used methods, the most important be
     }
 
 ```
+
+## Repository layout
+
+- `app/`: CLI implementation and internal helpers.
+- `templates/workspace/`: workspace copied into a user's `sketch-kit/` folder by `init`.
+- `templates/sketch/`: JavaScript and SCSS templates used by `create`.
+
+An optional [Three.js scene template](docs/threejs-template.md) includes an orbiting
+camera, cube, grid, and hover outline.
 
 ## CLI
 
@@ -135,9 +146,12 @@ sketch-kit starts a Vite development server with HMR on port 3002. Vite handles 
 
 `sketch-kit create [sketch name] [copy name(optional)]`
 
-sketch-kit will add a new sketch to your sketches and wil now be available in the menu. This sketch includes the base sketch view template and a scss file with the sketch name being used as the css class reference.
+sketch-kit will add a new sketch to your sketches and wil now be available in the menu. This sketch includes the base sketch view template and a colocated SCSS file scoped to the sketch element ID. Copying renames both primary files and updates their sketch references; extra files are copied unchanged.
 
-If the sketch already exists, you'll be prompted to copy or replace, creating a new nested iteration.
+New sketches prompt for an optional template: **None** (the default empty starter) or **Three.js**.
+Three.js sketches require `npm install three` in the host project. Noninteractive creation uses None.
+
+If the sketch already exists, you'll be prompted to copy or replace, creating a new nested iteration. Copying keeps the source code; replacing offers the template choice again.
 
 **Note;** give sketches unique names to ensure that there aren't conflicts when copying. The replace method will search through the code and indescriminately replace the sketch name with whatever the next sketch name will be
 

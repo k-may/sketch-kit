@@ -1,4 +1,4 @@
-// Shared by the CLI and browser. IDs are file locations; ancestry is metadata.
+// CLI registry validation, migration and mutation. No dependency on the workspace template.
 const own = (object, key) => Object.hasOwn(object, key);
 
 export function prepareRegistry(input) {

@@ -61,7 +61,8 @@ async function setup() {
     config.project = 'Sketch Kit smoke host';
     await writeFile(configPath, JSON.stringify(config, null, 2) + '\n');
     await cli(project, 'create', ['smoke']);
-    await writeFile(path.join(project, 'sketch-kit/js/sketches/smoke/smoke.js'), `import { BaseSketch } from '../../base/BaseSketch.js';
+    await writeFile(path.join(project, 'sketch-kit/js/sketches/smoke/smoke.js'), `import './smoke.scss';
+import { BaseSketch } from '../../base/BaseSketch.js';
 import { message } from '../../../../src/message.js';
 
 export default class smoke extends BaseSketch {
