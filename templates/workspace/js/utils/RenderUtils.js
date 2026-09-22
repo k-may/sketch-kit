@@ -1,52 +1,49 @@
+const TARGET_FRAME_RATE = 60;
 
-const TARGETFRAMERATE = 60;
-var lastFrameTime = 0;
+export const RenderUtils = {
+    // Starts immediately by default; pass { isRunning: false } for explicit start.
+    loop(callback, { targetFrameRate = TARGET_FRAME_RATE, isRunning: autoStart = true } = {}) {
+        if (!Number.isFinite(targetFrameRate) || targetFrameRate <= 0) {
+            throw new RangeError('targetFrameRate must be a positive finite number');
+        }
+        const interval = 1000 / targetFrameRate;
+        let running = false;
+        let frameId = null;
+        let lastTime = null;
+        let generation = 0;
 
-export let RenderUtils = {
-
-    /**
-     * Creates a loop that calls the callback function with the time and deltaTime
-     * @param callback
-     * @returns {{stop: stop, start: start}}
-     */
-    loop: (callback, { targetFrameRate } = {}) => {
-        let lastTime = 0;
-        let isRunning = true;
-        const loop = () => {
-            var time = window.performance.now();
-            const time_since_last = time - lastTime;
-            const target_time_between_frames = 1000 / (targetFrameRate || TARGETFRAMERATE)
-            const epsilon = 5;
-            if (
-                time_since_last >= target_time_between_frames - epsilon
-            ) {
-                const deltaTime = time - lastTime;
-                isRunning && callback({time,deltaTime});
+        const schedule = () => {
+            if (!running || frameId !== null) return;
+            const scheduledGeneration = generation;
+            frameId = window.requestAnimationFrame(time => tick(time, scheduledGeneration));
+        };
+        const tick = (time, scheduledGeneration) => {
+            if (!running || scheduledGeneration !== generation) return;
+            frameId = null;
+            const deltaTime = lastTime === null ? 0 : time - lastTime;
+            if (lastTime === null || deltaTime >= interval - 0.01) {
                 lastTime = time;
+                callback({ time, deltaTime });
             }
-
-            isRunning && window.requestAnimationFrame(loop);
-        }
-        requestAnimationFrame(loop);
-
-        return {
-            /**
-             * Stops the loop
-             */
-            stop: () => {
-                lastTime = 0;
-                isRunning = false;
+            // start()/stop() may have been called from inside the callback.
+            schedule();
+        };
+        const controls = {
+            stop() {
+                running = false;
+                generation++;
+                if (frameId !== null) window.cancelAnimationFrame(frameId);
+                frameId = null;
+                lastTime = null;
             },
-            /**
-             * Starts the loop
-             */
-            start: () => {
-                if (!isRunning) {
-                    isRunning = true;
-                    requestAnimationFrame(loop);
-                }
-            }
-        }
-    }
-
-}
+            start() {
+                if (running) return;
+                running = true;
+                lastTime = null;
+                schedule();
+            },
+        };
+        if (autoStart) controls.start();
+        return controls;
+    },
+};

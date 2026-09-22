@@ -1,19 +1,17 @@
 export const SketchUtils = {
+    // Escape every character outside lowercase ASCII/digits, including the escape
+    // delimiter itself. This preserves case, underscores and nested sketch IDs.
+    sanitizeElementName(name) {
+        return 'sk-' + Array.from(name, character =>
+            /^[a-z0-9]$/.test(character) ? character : `-${character.codePointAt(0).toString(16)}-`
+        ).join('');
+    },
 
-    /**
-     * Sanitize the name of a custom element (see : https://html.spec.whatwg.org/multipage/custom-elements.html#prod-potentialcustomelementname )
-     * @param name
-     * @returns {string}
-     */
-    sanitizeElementName : name => {
-
-        name = "sk-" + name.toLowerCase()
-        // Remove characters that are not allowed in custom element names
-        const sanitizedString = name.replace(/[^a-z0-9-]/g, '');
-
-        // Ensure that the name starts with a lowercase letter and contains at least one dash
-        const customElementName = sanitizedString.replace(/^[^a-z]+/, '').replace(/^-+/, '');
-
-        return customElementName;
-    }
-}
+    registerElement(name, constructor, registry = customElements) {
+        const existing = registry.get(name);
+        if (existing && existing !== constructor) {
+            throw new Error(`Custom element ${name} is already registered to a different sketch class.`);
+        }
+        if (!existing) registry.define(name, constructor);
+    },
+};

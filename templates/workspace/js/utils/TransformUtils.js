@@ -1,20 +1,6 @@
 import $M from './MatrixUtils.js';
 
-var TRANSFORM_PREFIX = 'transform';
-var TRANSFORM_3D = true; //Modernizr["csstransforms3d"];
-
-var domPrefixes = 'Webkit Moz O ms Khtml'.split(' '),
-    pfx = '',
-    elem = document.createElement('div');
-
-for (var i = 0; i < domPrefixes.length; i++) {
-    if (elem.style[domPrefixes[i] + 'AnimationName'] !== undefined) {
-        pfx = domPrefixes[i];
-        TRANSFORM_PREFIX = '-' + pfx.toLowerCase() + '-';
-        break;
-    }
-}
-TRANSFORM_PREFIX += 'transform';
+const TRANSFORM_3D = true;
 
 export let TransformUtils = {
     Translate(el, pos) {
@@ -32,7 +18,7 @@ export let TransformUtils = {
             //todo?
         }
 
-        el.style[TRANSFORM_PREFIX] = cssTransformMatrix;
+        el.style.transform = cssTransformMatrix;
     },
 
     GetTranslationMatrix: function (translationX, translationY, translationZ) {
@@ -146,7 +132,7 @@ export let TransformUtils = {
         var translationM = this.GetResultMatrix(listMatrix);
         cssTransformMatrix = this.MatrixToString3D(translationM);
 
-        el.style[TRANSFORM_PREFIX] = cssTransformMatrix;
+        el.style.transform = cssTransformMatrix;
     },
 
     GetResultMatrix: function (listMatix) {

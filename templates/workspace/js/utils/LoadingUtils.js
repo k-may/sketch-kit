@@ -1,99 +1,68 @@
-export let LoadingUtils = {
-    LoadAJAX: function(url) {
-        return new Promise((resolve, reject) => {
-            var xmlhttp = new XMLHttpRequest();
-            xmlhttp.onreadystatechange = function() {
-                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                    resolve(xmlhttp.responseText);
-                }
-            };
+const DEFAULT_TIMEOUT = 30000;
 
-            xmlhttp.open('GET', url, true);
-            xmlhttp.send();
-        });
-    },
-
-    LoadSVG: function(url) {
-        return new Promise((resolve, reject) => {
-            var xmlhttp = new XMLHttpRequest();
-            xmlhttp.onreadystatechange = function() {
-                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-                    resolve(xmlhttp.responseXML);
-                }
-            };
-
-            xmlhttp.open('GET', url, true);
-            xmlhttp.send();
-        });
-    },
-
-    LoadJSON: function(url) {
-        return new Promise((resolve, reject) => {
-            LoadingUtils.LoadAJAX(url).then(data => {
-                try {
-                    var data = JSON.parse(data);
-                } catch (err) {
-                    reject(err.message + ' in ' + data);
-                    return;
-                }
-                resolve(data);
-            });
-        });
-    },
-
-    LoadImages: function(imgs) {
-        var promises = [];
-        imgs.forEach(src => {
-            promises.push(this.LoadImage(src));
-        });
-        return Promise.all(promises);
-    },
-
-    LoadImage: function(src) {
-        return new Promise((resolve, reject) => {
-            if (!src) {
-                reject('LoadingUtils : img null');
-            } else {
-                var img = new Image();
-                img.onload = function() {
-                    img.onload = null;
-                    resolve(img);
-                };
-                img.onerror = function(e) {
-                    reject(e.message);
-                };
-                img.src = src;
+function request(url, { timeout = DEFAULT_TIMEOUT, signal } = {}, xml = false) {
+    return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        const cleanup = () => {
+            signal?.removeEventListener('abort', abort);
+            xhr.onload = xhr.onerror = xhr.onabort = xhr.ontimeout = null;
+        };
+        const fail = message => { cleanup(); reject(new Error(`${message}: ${url}`)); };
+        const abort = () => xhr.abort();
+        if (signal?.aborted) { fail('Request aborted'); return; }
+        xhr.open('GET', url, true);
+        xhr.timeout = timeout;
+        xhr.onload = () => {
+            if (xhr.status < 200 || xhr.status >= 300) {
+                fail(`HTTP ${xhr.status}`);
+                return;
             }
+            const value = xml ? xhr.responseXML : xhr.responseText;
+            cleanup();
+            resolve(value);
+        };
+        xhr.onerror = () => fail('Network error');
+        xhr.onabort = () => fail('Request aborted');
+        xhr.ontimeout = () => fail('Request timed out');
+        signal?.addEventListener('abort', abort, { once: true });
+        try { xhr.send(); } catch (error) { cleanup(); reject(error); }
+    });
+}
+
+export const LoadingUtils = {
+    LoadAJAX(url, options) { return request(url, options); },
+    LoadSVG(url, options) { return request(url, options, true); },
+    LoadJSON(url, options) {
+        return request(url, options).then(text => {
+            try { return JSON.parse(text); }
+            catch (cause) { throw new Error(`Invalid JSON: ${url}`, { cause }); }
         });
     },
-
-    LoadShader: function(src) {
-        return new Promise(function(resolve) {
-            var xhr = new XMLHttpRequest();
-            xhr.addEventListener('load', function(e) {
-                resolve(e.currentTarget.responseText);
-            });
-            xhr.open('GET', src);
-            xhr.send();
+    LoadShader(url, options) { return request(url, options); },
+    LoadShaders(urls, options) {
+        return Promise.all(urls.map(url => LoadingUtils.LoadShader(url, options)));
+    },
+    LoadImages(urls, options) {
+        return Promise.all(urls.map(url => LoadingUtils.LoadImage(url, options)));
+    },
+    LoadImage(src, { timeout = DEFAULT_TIMEOUT, signal } = {}) {
+        return new Promise((resolve, reject) => {
+            if (!src) { reject(new Error('Image source is required')); return; }
+            const img = new Image();
+            let timer;
+            const cleanup = () => {
+                clearTimeout(timer);
+                img.onload = img.onerror = null;
+                signal?.removeEventListener('abort', abort);
+            };
+            const fail = message => { cleanup(); reject(new Error(`${message}: ${src}`)); };
+            const abort = () => fail('Image load aborted');
+            if (signal?.aborted) { abort(); return; }
+            img.onload = () => { cleanup(); resolve(img); };
+            img.onerror = () => fail('Image load failed');
+            signal?.addEventListener('abort', abort, { once: true });
+            if (timeout > 0) timer = setTimeout(() => fail('Image load timed out'), timeout);
+            img.src = src;
         });
     },
-
-    LoadShaders: function(src) {
-        return new Promise(resolve => {
-            var promises = [];
-            for (var i = 0; i < src.length; i++) {
-                promises.push(this.LoadShader(src[i]));
-            }
-            Promise.all(promises).then(shaders => {
-                //TODO add mobile detection..
-                /*if(Modernizr.touchevents) {
-                    for (var i = 0; i < shaders.length; i++) {
-                        shaders[i] = "#define MOBILE\n" + shaders[i];
-                    }
-                }*/
-
-                resolve(shaders);
-            });
-        });
-    }
 };
