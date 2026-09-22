@@ -1,13 +1,13 @@
 import inquirer from 'inquirer';
-import { insertSketchStyle } from './sketch-styles.js';
 import fs from 'fs-extra';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { utils } from './utils.js';
-import { prepareRegistry, validateSketchId, planSketch, registerSketch, serializeRegistry } from '../lib/sketch-kit/js/utils/SketchRegistry.js';
+import { prepareRegistry, validateSketchId, planSketch, registerSketch, serializeRegistry } from './lib/SketchRegistry.js';
 
-const templates = fileURLToPath(new URL('../lib/templates/', import.meta.url));
+const templates = fileURLToPath(new URL('../templates/sketch/', import.meta.url));
+const scriptTemplates = new Map([['none', 'script.txt'], ['threejs', 'script_threejs.txt']]);
 
 export default class Create {
     constructor(config, args = []) {
@@ -37,7 +37,7 @@ export default class Create {
         validateSketchId(name);
         if (!Object.hasOwn(this.sketchConfig.sketches, name)) {
             if (this._args.length > 1) throw new Error(`Cannot copy missing sketch: ${name}`);
-            return this._createSketch(name, author);
+            return this._createSketch(name, author, await this._promptTemplate());
         }
         if (this._args.length > 1 || process.env.TEST === 'true') return this._copySketch(name, author);
         const { action } = await inquirer.prompt({
@@ -48,11 +48,25 @@ export default class Create {
             const id = await this._promptCopyName(name);
             return this._copySketch(name, author, id);
         }
-        if (action === 'replace') return this._writeSketch({ id: name, author, replace: true });
+        if (action === 'replace') return this._writeSketch({ id: name, author, replace: true, template: await this._promptTemplate() });
     }
 
-    _createSketch(name, author) {
-        return this._writeSketch({ id: validateSketchId(name), author });
+    async _promptTemplate() {
+        // Scripted creation remains noninteractive and uses the empty starter.
+        if (process.env.TEST === 'true' || this._config.debug || !process.stdin.isTTY) return 'none';
+        const { template } = await inquirer.prompt({
+            type: 'list', name: 'template', message: 'Template (optional)', default: 'none',
+            choices: [
+                { name: 'None', value: 'none' },
+                { name: 'Three.js ? cube, ground and orbiting camera', value: 'threejs' },
+            ],
+        });
+        if (template === 'threejs') utils.message('Three.js requires the host dependency: npm install three');
+        return template;
+    }
+
+    _createSketch(name, author, template = 'none') {
+        return this._writeSketch({ id: validateSketchId(name), author, template });
     }
 
     _copySketch(sourceId, author, requestedId = this._args[1]) {
@@ -117,7 +131,7 @@ export default class Create {
         validateSketchId(id);
         return {
             directory: path.join(this.root, 'js/sketches', id),
-            sass: path.join(this.root, 'scss/sketches', `_${id}.scss`),
+            sass: path.join(this.root, 'js/sketches', id, `${id}.scss`),
         };
     }
 
@@ -125,12 +139,25 @@ export default class Create {
         const destination = this._paths(id);
         // Case-insensitive comparison also prevents cross-platform collisions.
         const directories = await fs.readdir(path.join(this.root, 'js/sketches'));
-        const styles = await fs.readdir(path.join(this.root, 'scss/sketches'));
+        let legacyStyles = [];
+        try {
+            legacyStyles = await fs.readdir(path.join(this.root, 'scss/sketches'));
+        } catch (error) {
+            if (error.code !== 'ENOENT') throw error;
+        }
         return directories.some(name => name.toLowerCase() === path.basename(destination.directory).toLowerCase()) ||
-            styles.some(name => name.toLowerCase() === path.basename(destination.sass).toLowerCase());
+            legacyStyles.some(name => name.toLowerCase() === `_${id}.scss`.toLowerCase());
     }
 
-    async _writeSketch({ sourceId = null, id, author, replace = false }) {
+    async _assertModernStyles(id) {
+        const legacy = path.join(this.root, 'scss/sketches', `_${id}.scss`);
+        if (await fs.pathExists(legacy)) {
+            throw new Error(`Sketch ${id} uses legacy styles. Move scss/sketches/_${id}.scss to js/sketches/${id}/${id}.scss, import "./${id}.scss" from ${id}.js, and remove its import from scss/main.scss. See docs/sass.md before copying or replacing.`);
+        }
+    }
+
+    async _writeSketch({ sourceId = null, id, author, replace = false, template = 'none' }) {
+        if (!scriptTemplates.has(template)) throw new Error(`Unknown sketch template: ${template}`);
         const lockPath = path.join(this.root, '.sketch-kit-create.lock');
         let lock;
         try {
@@ -149,6 +176,7 @@ export default class Create {
             } else {
                 planned = await this._planAvailableSketch(config, sourceId, id);
             }
+            if (sourceId !== null || replace) await this._assertModernStyles(sourceId ?? planned.id);
             const destination = this._paths(planned.id);
             stage = await fs.mkdtemp(path.join(this.root, '.sketch-kit-stage-'));
             const stagedDirectory = path.join(stage, 'sketch');
@@ -160,41 +188,30 @@ export default class Create {
                 script = await fs.readFile(path.join(source.directory, `${sourceId}.js`), 'utf8');
                 sass = await fs.readFile(source.sass, 'utf8');
                 for (const file of await fs.readdir(source.directory)) {
-                    if (file !== `${sourceId}.js`) await fs.copy(path.join(source.directory, file), path.join(stagedDirectory, file));
+                    if (file !== `${sourceId}.js` && file !== `${sourceId}.scss`) await fs.copy(path.join(source.directory, file), path.join(stagedDirectory, file));
                 }
             } else {
-                script = await fs.readFile(path.join(templates, 'script.txt'), 'utf8');
+                script = await fs.readFile(path.join(templates, scriptTemplates.get(template)), 'utf8');
                 sass = await fs.readFile(path.join(templates, 'sass.txt'), 'utf8');
             }
             const token = sourceId ?? '{sketchname}';
             await fs.writeFile(path.join(stagedDirectory, `${planned.id}.js`), script.split(token).join(planned.id));
-            const stagedSass = path.join(stage, 'sketch.scss');
+            const stagedSass = path.join(stagedDirectory, `${planned.id}.scss`);
             await fs.writeFile(stagedSass, sass.split(token).join(planned.id));
 
-            const mainPath = path.join(this.root, 'scss/main.scss');
-            const oldMain = await fs.readFile(mainPath);
             const oldConfig = await fs.readFile(this.configPath);
             const nextConfig = replace ? config : registerSketch(config, planned, author);
-            const nextMain = insertSketchStyle(oldMain.toString('utf8'), planned.id);
             const backupDirectory = path.join(stage, 'previous-sketch');
-            const backupSass = path.join(stage, 'previous.scss');
-            let installedDirectory = false, installedSass = false, savedDirectory = false, savedSass = false;
+            let installedDirectory = false, savedDirectory = false;
             try {
                 if (replace) {
                     if (await fs.pathExists(destination.directory)) {
                         await fs.move(destination.directory, backupDirectory);
                         savedDirectory = true;
                     }
-                    if (await fs.pathExists(destination.sass)) {
-                        await fs.move(destination.sass, backupSass);
-                        savedSass = true;
-                    }
                 }
                 await fs.move(stagedDirectory, destination.directory, { overwrite: false });
                 installedDirectory = true;
-                await fs.move(stagedSass, destination.sass, { overwrite: false });
-                installedSass = true;
-                await fs.writeFile(mainPath, nextMain);
                 const configTemp = path.join(stage, 'config.json');
                 await fs.writeJSON(configTemp, serializeRegistry(nextConfig), { spaces: 4 });
                 await fs.rename(configTemp, this.configPath);
@@ -202,10 +219,7 @@ export default class Create {
                 // All paths are derived from validated IDs beneath this workspace.
                 try {
                     if (installedDirectory) await fs.remove(destination.directory);
-                    if (installedSass) await fs.remove(destination.sass);
                     if (savedDirectory) await fs.move(backupDirectory, destination.directory);
-                    if (savedSass) await fs.move(backupSass, destination.sass);
-                    await fs.writeFile(mainPath, oldMain);
                     await fs.writeFile(this.configPath, oldConfig);
                 } catch (rollbackError) {
                     const recovery = stage;

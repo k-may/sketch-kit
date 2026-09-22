@@ -1,3 +1,4 @@
+import "./{sketchname}.scss";
 import {BaseSketch} from "../../base/BaseSketch.js";
 
 export default class {sketchname} extends BaseSketch {

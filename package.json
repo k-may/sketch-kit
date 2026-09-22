@@ -10,8 +10,9 @@
   "type": "module",
   "scripts": {
     "start": "node index.js",
-    "test": "mocha 'test/**/*.js'",
+  "test": "mocha 'test/**/*.js' && node --test test/utils.test.mjs",
     "clean": "rimraf sketch-kit",
+    "test:utils": "node --test test/utils.test.mjs",
     "test:registry": "node --test test/registry.test.mjs",
     "smoke": "node scripts/smoke.mjs",
     "smoke:setup": "node scripts/smoke.mjs setup",

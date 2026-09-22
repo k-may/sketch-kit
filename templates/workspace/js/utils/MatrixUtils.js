@@ -1,9 +1,11 @@
+import Vector from './VectorUtils.js';
+
 var Sylvester = {
     version: '0.1.3',
     precision: 1e-6
 };
 
-function Matrix() {}
+export function Matrix() {}
 Matrix.prototype = {
     // Returns element (i,j) of the matrix
     e: function(i, j) {
@@ -15,7 +17,7 @@ Matrix.prototype = {
 
     // Returns row k of the matrix as a vector
     row: function(i) {
-        if (i > this.elements.length) {
+        if (i < 1 || i > this.elements.length) {
             return null;
         }
         return Vector.create(this.elements[i - 1]);
@@ -23,7 +25,7 @@ Matrix.prototype = {
 
     // Returns column k of the matrix as a vector
     col: function(j) {
-        if (j > this.elements[0].length) {
+        if (j < 1 || j > this.elements[0].length) {
             return null;
         }
         var col = [],
@@ -304,7 +306,7 @@ Matrix.prototype = {
     // If the matrix is square, returns the diagonal elements as a vector.
     // Otherwise, returns null.
     diagonal: function() {
-        if (!this.isSquare) {
+        if (!this.isSquare()) {
             return null;
         }
         var els = [],
@@ -333,7 +335,7 @@ Matrix.prototype = {
         do {
             i = k - n;
             if (M.elements[i][i] == 0) {
-                for (j = i + 1; j < k; j++) {
+                for (let j = i + 1; j < k; j++) {
                     if (M.elements[j][i] != 0) {
                         els = [];
                         np = kp;
@@ -347,7 +349,7 @@ Matrix.prototype = {
                 }
             }
             if (M.elements[i][i] != 0) {
-                for (j = i + 1; j < k; j++) {
+                for (let j = i + 1; j < k; j++) {
                     var multiplier = M.elements[j][i] / M.elements[i][i];
                     els = [];
                     np = kp;
@@ -376,14 +378,8 @@ Matrix.prototype = {
             return null;
         }
         var M = this.toRightTriangular();
-        var det = M.elements[0][0],
-            n = M.elements.length - 1,
-            k = n,
-            i;
-        do {
-            i = k - n + 1;
-            det = det * M.elements[i][i];
-        } while (--n);
+        let det = 1;
+        for (let i = 0; i < M.elements.length; i++) det *= M.elements[i][i];
         return det;
     },
 
@@ -401,14 +397,8 @@ Matrix.prototype = {
         if (!this.isSquare()) {
             return null;
         }
-        var tr = this.elements[0][0],
-            n = this.elements.length - 1,
-            k = n,
-            i;
-        do {
-            i = k - n + 1;
-            tr += this.elements[i][i];
-        } while (--n);
+        let tr = 0;
+        for (let i = 0; i < this.elements.length; i++) tr += this.elements[i][i];
         return tr;
     },
 

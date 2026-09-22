@@ -2,7 +2,7 @@ import SketchKit from '../app/sketch-kit.js';
 import {assert} from 'chai';
 import fs from 'fs-extra';
 import path from 'path';
-import {SketchUtils} from "../lib/sketch-kit/js/utils/SketchUtils.js";
+import {SketchUtils} from "../templates/workspace/js/utils/SketchUtils.js";
 
 const sketchesPath = path.resolve(process.cwd(), 'sketch-kit');
 

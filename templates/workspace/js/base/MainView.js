@@ -80,34 +80,20 @@ export class MainView extends BaseView {
             } catch (e) {
                 console.error("import error.", e);
             }
-        });
+        }).catch(error => console.error(`Could not load sketch ${sketchId}:`, error));
     }
 
     //---------------------------------------------------
 
-    _getSketch(sketchId) {
-
-        return new Promise(resolve => {
-            if (this._cachedSketches[sketchId]) {
-                resolve(this._cachedSketches[sketchId]);
-            } else {
-                import(`../sketches/${sketchId}/${sketchId}.js`).then(module => {
-                    let name = SketchUtils.sanitizeElementName(sketchId);
-                    try {
-                        customElements.define(name, module.default,);
-                    } catch (e) {
-                        console.error("Couldn't define custom element.", e);
-                    }
-                    var sketch = document.createElement(name);
-                    sketch.id = sketchId;
-
-                    //we'll cache all sketches to preserve state
-                    this._cachedSketches[sketchId] = sketch;
-
-                    resolve(sketch);
-                });
-            }
-        });
+    async _getSketch(sketchId) {
+        if (this._cachedSketches[sketchId]) return this._cachedSketches[sketchId];
+        const module = await import(`../sketches/${sketchId}/${sketchId}.js`);
+        const name = SketchUtils.sanitizeElementName(sketchId);
+        SketchUtils.registerElement(name, module.default);
+        const sketch = document.createElement(name);
+        sketch.id = sketchId;
+        this._cachedSketches[sketchId] = sketch;
+        return sketch;
     }
 
     _addSketch(sketchId, sketch) {

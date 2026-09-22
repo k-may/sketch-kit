@@ -6,7 +6,7 @@ import fs from 'fs-extra';
 import { spawnSync } from 'node:child_process';
 import Create from '../app/create.js';
 import inquirer from 'inquirer';
-import { prepareRegistry, planSketch, registerSketch, buildSketchTree, serializeRegistry, validateSketchId } from '../lib/sketch-kit/js/utils/SketchRegistry.js';
+import { prepareRegistry, planSketch, registerSketch, buildSketchTree, serializeRegistry, validateSketchId } from '../app/lib/SketchRegistry.js';
 
 const legacy = () => ({ project: 'test', sketches: { motion: { author: 'original' } } });
 
@@ -15,10 +15,10 @@ async function fixture(t, input = legacy()) {
     // This test owns only this newly allocated directory.
     t.after(() => fs.remove(root));
     await fs.outputJSON(path.join(root, 'sketch-kit.config.json'), input);
-    await fs.outputFile(path.join(root, 'js/sketches/motion/motion.js'), 'export default class motion { name = "motion"; }');
+    await fs.outputFile(path.join(root, 'js/sketches/motion/motion.js'), 'import "./motion.scss"; export default class motion { name = "motion"; }');
     await fs.outputFile(path.join(root, 'js/sketches/motion/helper.js'), 'export const keep = true;');
-    await fs.outputFile(path.join(root, 'scss/sketches/_motion.scss'), '.motion { color: red; }');
-    await fs.outputFile(path.join(root, 'scss/main.scss'), '// code-in: sketch-styles\n@use "sketches/motion" as sketch_motion;\n// code-out: sketch-styles\n');
+    await fs.outputFile(path.join(root, 'js/sketches/motion/motion.scss'), '#motion { color: red; }');
+    await fs.outputFile(path.join(root, 'scss/main.scss'), 'body { color: red; }\n');
     const command = new Create({ root, configFile: 'sketch-kit.config.json' }, []);
     return { root, command, read: () => fs.readJSON(path.join(root, 'sketch-kit.config.json')) };
 }
@@ -148,7 +148,7 @@ test('a late failure rolls back new files, stylesheet and registry', async t => 
 test('missing source files reject without migrating or leaving partial output', async t => {
     const { root, command, read } = await fixture(t);
     const before = await read();
-    await fs.remove(path.join(root, 'scss/sketches/_motion.scss'));
+    await fs.remove(path.join(root, 'js/sketches/motion/motion.scss'));
     await assert.rejects(command._copySketch('motion', 'author'), /ENOENT/);
     assert.deepEqual(await read(), before);
     assert.equal(await fs.pathExists(path.join(root, 'js/sketches/motion_1')), false);
@@ -161,7 +161,9 @@ test('replace preserves branch metadata and does not duplicate SCSS imports', as
     await command._writeSketch({ id: 'motion_1', author: 'other', replace: true });
     assert.deepEqual((await read()).sketches.motion_1, before.sketches.motion_1);
     const main = await fs.readFile(path.join(root, 'scss/main.scss'), 'utf8');
-    assert.equal(main.split('@use "sketches/motion_1" as sketch_motion_1;').length - 1, 1);
+    assert.equal(main, 'body { color: red; }\n');
+    assert.match(await fs.readFile(path.join(root, 'js/sketches/motion_1/motion_1.js'), 'utf8'), /import ".\/motion_1.scss"/);
+    assert.match(await fs.readFile(path.join(root, 'js/sketches/motion_1/motion_1.scss'), 'utf8'), /#motion_1/);
 });
 
 test('a failed replacement restores the original sketch and its extra files', async t => {
@@ -178,7 +180,7 @@ test('a failed replacement restores the original sketch and its extra files', as
         fs.rename = rename;
     }
     assert.deepEqual(await read(), before);
-    assert.equal(await fs.readFile(path.join(root, 'js/sketches/motion/motion.js'), 'utf8'), 'export default class motion { name = "motion"; }');
+    assert.equal(await fs.readFile(path.join(root, 'js/sketches/motion/motion.js'), 'utf8'), 'import "./motion.scss"; export default class motion { name = "motion"; }');
     assert.equal(await fs.readFile(path.join(root, 'js/sketches/motion/helper.js'), 'utf8'), 'export const keep = true;');
 });
 
@@ -229,6 +231,10 @@ test('initialized workspace creates and builds a branch with the new menu', asyn
     const saved = await fs.readJSON(path.join(project, 'sketch-kit/sketch-kit.config.json'));
     assert.equal(saved.sketches.spring.parentId, 'motion');
     assert.ok(await fs.pathExists(path.join(project, 'sketch-kit/build/index.html')));
+    const assets = path.join(project, 'sketch-kit/build/assets');
+    const cssFiles = (await fs.readdir(assets)).filter(file => file.endsWith('.css'));
+    const css = (await Promise.all(cssFiles.map(file => fs.readFile(path.join(assets, file), 'utf8')))).join('\n');
+    for (const id of ['SketchKit', 'motion', 'spring']) assert.ok(css.includes(`#${id}`), `Missing built CSS for ${id}`);
 });
 
 test('interactive copy suggests the next name and accepts the default', async t => {
@@ -289,26 +295,190 @@ test('cancelling the name prompt leaves the registry and files untouched', async
 });
 
 
-test('missing Sass insertion directive leaves the project unchanged', async t => {
-    const { root, command, read } = await fixture(t);
-    const mainPath = path.join(root, 'scss/main.scss');
-    await fs.writeFile(mainPath, 'body { color: red; }');
-    const before = await read();
-    await assert.rejects(command._copySketch('motion', 'author'), /code-in\/code-out/);
-    assert.deepEqual(await read(), before);
-    assert.equal(await fs.readFile(mainPath, 'utf8'), 'body { color: red; }');
-    assert.equal(await fs.pathExists(path.join(root, 'js/sketches/motion_1')), false);
-    assert.equal(await fs.pathExists(path.join(root, 'scss/sketches/_motion_1.scss')), false);
+test('creation and copying need no global stylesheet or legacy style directory', async t => {
+    const { root, command } = await fixture(t);
+    await fs.remove(path.join(root, 'scss/main.scss'));
+    await command._createSketch('fresh', 'author');
+    await command._copySketch('motion', 'author');
+    assert.match(await fs.readFile(path.join(root, 'js/sketches/fresh/fresh.js'), 'utf8'), /import \".\/fresh.scss\"/);
+    assert.ok(await fs.pathExists(path.join(root, 'js/sketches/fresh/fresh.scss')));
+    assert.equal(await fs.pathExists(path.join(root, 'scss/main.scss')), false);
+    assert.equal(await fs.pathExists(path.join(root, 'scss/sketches')), false);
 });
 
+test('copies rename the primary style and preserve additional styles and assets', async t => {
+    const { root, command } = await fixture(t);
+    const source = path.join(root, 'js/sketches/motion');
+    await fs.writeFile(path.join(source, 'motion.scss'), '@use "./parts/palette"; #motion { color: palette.$ink; }');
+    await fs.outputFile(path.join(source, 'parts/_palette.scss'), '$ink: red;');
+    await fs.writeFile(path.join(source, 'extra.scss'), '.extra { color: blue; }');
+    await fs.writeFile(path.join(source, 'asset.txt'), 'unchanged');
+    await command._copySketch('motion', 'author', 'spring');
+    const target = path.join(root, 'js/sketches/spring');
+    assert.match(await fs.readFile(path.join(target, 'spring.js'), 'utf8'), /import \".\/spring.scss\"/);
+    assert.equal(await fs.readFile(path.join(target, 'spring.scss'), 'utf8'), '@use "./parts/palette"; #spring { color: palette.$ink; }');
+    for (const file of ['parts/_palette.scss', 'extra.scss', 'asset.txt']) {
+        assert.equal(await fs.readFile(path.join(target, file), 'utf8'), await fs.readFile(path.join(source, file), 'utf8'));
+    }
+    assert.equal(await fs.pathExists(path.join(target, 'motion.scss')), false);
+});
 
-test('Sass insertion preserves CRLF, precedes rules, and is idempotent', async () => {
-    const { insertSketchStyle } = await import('../app/sketch-styles.js');
-    const source = '// code-in: sketch-styles\r\n// code-out: sketch-styles\r\n@use "menu";\r\nbody { color: red; }';
-    const next = insertSketchStyle(source, 'menu');
-    assert.ok(next.includes('@use "sketches/menu" as sketch_menu;\r\n// code-out'));
-    assert.ok(next.endsWith('@use "menu";\r\nbody { color: red; }'));
-    assert.equal(insertSketchStyle(next, 'menu'), next);
-    assert.throws(() => insertSketchStyle('body {}\n' + source, 'motion'), /beginning/);
-    assert.throws(() => insertSketchStyle(source + '\n// code-out: sketch-styles', 'motion'), /single/);
+test('legacy styles reject copy and replacement without changing files', async t => {
+    const { root, command, read } = await fixture(t);
+    const legacyPath = path.join(root, 'scss/sketches/_motion.scss');
+    await fs.outputFile(legacyPath, '#motion { color: red; }');
+    const before = await read();
+    const scriptPath = path.join(root, 'js/sketches/motion/motion.js');
+    const beforeScript = await fs.readFile(scriptPath, 'utf8');
+    await assert.rejects(command._copySketch('motion', 'author'), /legacy styles.*docs\/sass.md/);
+    await assert.rejects(command._writeSketch({ id: 'motion', author: 'other', replace: true }), /legacy styles/);
+    assert.deepEqual(await read(), before);
+    assert.equal(await fs.readFile(scriptPath, 'utf8'), beforeScript);
+    assert.equal(await fs.readFile(legacyPath, 'utf8'), '#motion { color: red; }');
+    assert.equal(await fs.pathExists(path.join(root, 'js/sketches/motion_1')), false);
+    assert.equal(await fs.pathExists(path.join(root, '.sketch-kit-create.lock')), false);
+});
+
+test('orphaned legacy styles still reserve their IDs without requiring that directory', async t => {
+    const { root, command } = await fixture(t);
+    await fs.outputFile(path.join(root, 'scss/sketches/_MOTION_1.scss'), '#MOTION_1 {}');
+    assert.equal(await command._copySketch('motion', 'author'), 'motion_2');
+    await assert.rejects(command._createSketch('MOTION_1', 'author'), /Destination already exists/);
+});
+
+test('Vite serves colocated SCSS imports and sends style updates', async t => {
+    const { root, command } = await fixture(t);
+    await command._createSketch('fresh', 'author');
+    await fs.outputFile(path.join(root, 'js/base/BaseSketch.js'), 'export class BaseSketch extends HTMLElement {}');
+    const { createServer } = await import('vite');
+    const server = await createServer({
+        root, configFile: false, logLevel: 'error',
+        server: { host: '127.0.0.1', port: 0 },
+    });
+    t.after(() => server.close());
+    await server.listen();
+    const origin = `http://127.0.0.1:${server.httpServer.address().port}`;
+    const jsResponse = await fetch(`${origin}/js/sketches/fresh/fresh.js`);
+    assert.equal(jsResponse.status, 200);
+    const js = await jsResponse.text();
+    assert.match(js, /fresh.scss/);
+    const styleUrl = '/js/sketches/fresh/fresh.scss';
+    const cssResponse = await fetch(origin + styleUrl);
+    assert.equal(cssResponse.status, 200);
+    const css = await cssResponse.text();
+    assert.match(css, /#fresh/);
+    const updates = [];
+    const originalSend = server.ws.send.bind(server.ws);
+    server.ws.send = (...args) => { updates.push(args[0]); return originalSend(...args); };
+    await fs.writeFile(path.join(root, 'js/sketches/fresh/fresh.scss'), '#fresh { color: rgb(12, 34, 56); }');
+    const deadline = Date.now() + 5000;
+    while (!updates.some(message => message.type === 'update') && Date.now() < deadline) {
+        await new Promise(resolve => setTimeout(resolve, 25));
+    }
+    assert.ok(updates.some(message => message.type === 'update' && message.updates.some(update => update.path === styleUrl)), 'Expected a style HMR update');
+    const updated = await (await fetch(origin + styleUrl)).text();
+    assert.match(updated, /12, 34, 56/);
+});
+
+test('template registry reader accepts CLI output without exposing CLI mutations', async () => {
+    const browser = await import('../templates/workspace/js/utils/SketchRegistry.js');
+    assert.deepEqual(Object.keys(browser).sort(), ['buildSketchTree', 'prepareRegistry']);
+    let config = prepareRegistry(legacy()).config;
+    config = registerSketch(config, planSketch(config, 'motion', 'spring'), 'author');
+    const serialized = serializeRegistry(config);
+    assert.deepEqual(browser.prepareRegistry(serialized), prepareRegistry(serialized));
+    assert.deepEqual(browser.buildSketchTree(config.sketches), buildSketchTree(config.sketches));
+    assert.deepEqual(browser.prepareRegistry(legacy()), prepareRegistry(legacy()));
+});
+
+function interactiveTerminal(t) {
+    const descriptor = Object.getOwnPropertyDescriptor(process.stdin, 'isTTY');
+    const previousTest = process.env.TEST;
+    Object.defineProperty(process.stdin, 'isTTY', { configurable: true, value: true });
+    delete process.env.TEST;
+    t.after(() => {
+        if (descriptor) Object.defineProperty(process.stdin, 'isTTY', descriptor);
+        else delete process.stdin.isTTY;
+        if (previousTest === undefined) delete process.env.TEST;
+        else process.env.TEST = previousTest;
+    });
+}
+
+test('interactive creation defaults to None and generates the empty starter', async t => {
+    interactiveTerminal(t);
+    const { root, command } = await fixture(t);
+    await command._getConfig();
+    t.mock.method(inquirer, 'prompt', async question => {
+        assert.equal(question.name, 'template');
+        assert.equal(question.default, 'none');
+        assert.deepEqual(question.choices.map(choice => choice.value), ['none', 'threejs']);
+        return { template: question.default };
+    });
+    await command._tryCreateSketch('fresh', 'author');
+    const script = await fs.readFile(path.join(root, 'js/sketches/fresh/fresh.js'), 'utf8');
+    assert.match(script, /class fresh extends BaseSketch/);
+    assert.doesNotMatch(script, /three/);
+});
+
+test('interactive Three.js selection substitutes names and uses standard Sass', async t => {
+    interactiveTerminal(t);
+    const { root, command } = await fixture(t);
+    await command._getConfig();
+    t.mock.method(inquirer, 'prompt', async () => ({ template: 'threejs' }));
+    await command._tryCreateSketch('scene', 'author');
+    const script = await fs.readFile(path.join(root, 'js/sketches/scene/scene.js'), 'utf8');
+    assert.match(script, /from 'three'/);
+    assert.match(script, /class scene extends BaseSketch/);
+    assert.match(script, /import '.\/scene.scss'/);
+    assert.doesNotMatch(script, /\{sketchname\}/);
+    const expectedSass = (await fs.readFile(new URL('../templates/sketch/sass.txt', import.meta.url), 'utf8')).replaceAll('{sketchname}', 'scene');
+    assert.equal(await fs.readFile(path.join(root, 'js/sketches/scene/scene.scss'), 'utf8'), expectedSass);
+});
+
+test('cancelling template selection leaves no files or registry changes', async t => {
+    interactiveTerminal(t);
+    const { root, command, read } = await fixture(t);
+    await command._getConfig();
+    const before = await read();
+    t.mock.method(inquirer, 'prompt', async () => { throw new Error('Template cancelled'); });
+    await assert.rejects(command._tryCreateSketch('fresh', 'author'), /Template cancelled/);
+    assert.deepEqual(await read(), before);
+    assert.equal(await fs.pathExists(path.join(root, 'js/sketches/fresh')), false);
+    assert.equal(await fs.pathExists(path.join(root, '.sketch-kit-create.lock')), false);
+});
+
+test('replacement offers template selection and retains ancestry', async t => {
+    interactiveTerminal(t);
+    const { root, command, read } = await fixture(t);
+    await command._getConfig();
+    const before = await read();
+    const calls = [];
+    t.mock.method(inquirer, 'prompt', async question => {
+        calls.push(question.name);
+        return question.name === 'action' ? { action: 'replace' } : { template: 'threejs' };
+    });
+    await command._tryCreateSketch('motion', 'author');
+    assert.deepEqual(calls, ['action', 'template']);
+    assert.deepEqual(prepareRegistry(await read()).config, prepareRegistry(before).config);
+    assert.match(await fs.readFile(path.join(root, 'js/sketches/motion/motion.js'), 'utf8'), /from 'three'/);
+});
+
+test('unsupported template names cannot escape the template directory', async t => {
+    const { root, command } = await fixture(t);
+    await assert.rejects(command._createSketch('fresh', 'author', '../outside'), /Unknown sketch template/);
+    assert.equal(await fs.pathExists(path.join(root, 'js/sketches/fresh')), false);
+});
+
+test('noninteractive creation defaults to None without prompting', async t => {
+    const descriptor = Object.getOwnPropertyDescriptor(process.stdin, 'isTTY');
+    Object.defineProperty(process.stdin, 'isTTY', { configurable: true, value: false });
+    t.after(() => {
+        if (descriptor) Object.defineProperty(process.stdin, 'isTTY', descriptor);
+        else delete process.stdin.isTTY;
+    });
+    const { root, command } = await fixture(t);
+    await command._getConfig();
+    t.mock.method(inquirer, 'prompt', () => { throw new Error('Unexpected prompt'); });
+    await command._tryCreateSketch('fresh', 'author');
+    assert.doesNotMatch(await fs.readFile(path.join(root, 'js/sketches/fresh/fresh.js'), 'utf8'), /from 'three'/);
 });

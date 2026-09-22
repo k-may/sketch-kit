@@ -34,11 +34,4 @@ export let BrowserUtils = {
         return /ipad/.test(window.navigator.userAgent.toLowerCase());
     },
 
-    isIE11() {
-        return true; ///x64|x32/ig.test(window.navigator.userAgent)
-    },
-
-    isIE() {
-        return /rv:11.0/i.test(navigator.userAgent) || /Edge\/\d./i.test(navigator.userAgent);
-    },
 };
