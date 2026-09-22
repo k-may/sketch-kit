@@ -63,10 +63,10 @@ const { personalSite, github } = Astro.props;
         <md-icon>close</md-icon>
       </md-icon-button>
     </nav>
-    <md-text-button href="#method">method</md-text-button>
-    <md-text-button href="#demo">iterations</md-text-button>
-    <md-text-button href="#install">install</md-text-button>
-    <md-text-button href={personalSite}>kevinmayo.com ↗</md-text-button>
-    <md-text-button class="nav-github" href={github}>GitHub ↗</md-text-button>
+    <md-text-button href="#method" onclick="document.body.classList.toggle('mobile-menu-active');">method</md-text-button>
+    <md-text-button href="#demo" onclick="document.body.classList.toggle('mobile-menu-active');">iterations</md-text-button>
+    <md-text-button href="#install" onclick="document.body.classList.toggle('mobile-menu-active');">install</md-text-button>
+    <md-text-button href={personalSite} onclick="document.body.classList.toggle('mobile-menu-active');">kevinmayo.com ↗</md-text-button>
+    <md-text-button class="nav-github" href={github} onclick="document.body.classList.toggle('mobile-menu-active');">GitHub ↗</md-text-button>
   </div>
 </header>
