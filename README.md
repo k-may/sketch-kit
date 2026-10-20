@@ -189,19 +189,38 @@ sketch-kit will create a `build/` folder containing a static build of the projec
 
 ## Automated releases
 
-PRs targeting `main` run CI. After merging, the source branch determines the release:
+PRs targeting main run **PR Checks**. Merging a fix/* or feature/* PR runs
+**Prepare Release PR**, which creates or refreshes a single release/next PR:
 
-- `fix/*`: patch (for example, 1.7.2 becomes 1.7.3).
-- `feature/*`: minor (for example, 1.7.2 becomes 1.8.0).
-- Other branch names: no automatic release.
+- fix/* requests a patch bump (1.0.0 becomes 1.0.1).
+- feature/* requests a minor bump (1.0.0 becomes 1.1.0).
+- A pending minor bump stays minor when more fixes arrive. Additional features
+  also stay at 1.1.0 until the release merges.
 
-The release job queues behind other releases, checks out current `main`, updates
-`package.json` and `package-lock.json`, and runs the build and tests. It then commits
-the version, pushes `main` and its `v<version>` tag atomically, and publishes to npm.
-A rerun resumes the existing release commit and skips a version already published.
-Closing an unmerged PR or manually pushing a tag does not publish.
+The automation rebuilds release/next from current main, updates package.json and
+package-lock.json, and records the pending bump in its commit. Do not manually edit
+this managed branch. Updates can dismiss existing approvals under repository rules.
+The branch is pushed with a lease so concurrent edits are not silently overwritten.
+Preparation and publishing queue together to avoid competing release jobs.
 
-Configure the repository secret `NPM_TOKEN` with permission to publish `sketch-kit`.
-Repository rules must allow the workflow's `GITHUB_TOKEN` to push release commits
-to `main` and create version tags. If branch protection requires all changes through
-PRs, configure an allowed automation identity before enabling this release flow.
+When you merge the release/next PR, **Publish Release** checks out that exact merged
+commit, validates the version, runs tests, creates its v<version> tag, and publishes
+to npm. It never pushes a commit to main. Reruns reuse the tag and skip an already
+published npm version. Other branch names and unmerged PR closures do not release.
+
+Setup:
+
+- Add the repository secret NPM_TOKEN with permission to publish sketch-kit.
+- In Settings > Actions > General > Workflow permissions, enable **Allow GitHub
+  Actions to create and approve pull requests**. The workflow requests contents:write
+  and pull-requests:write; it does not approve or merge the release PR.
+- Allow automation to update release/next and create version tags. Main can keep
+  its requirement that changes arrive through PRs.
+- GitHub may require approval before PR Checks run on a bot-created release PR.
+  For automatic checks, optionally set RELEASE_PR_TOKEN to a GitHub App installation
+  token (or a fine-grained token) with contents and pull request write permissions.
+  Preparation uses that token for both the branch push and PR updates. Without it,
+  the built-in GITHUB_TOKEN is used. Required checks must pass before merging.
+
+The first preparation/publish workflows become available after these workflow
+files reach main. No npm package is published merely by opening a release PR.
