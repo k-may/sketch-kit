@@ -186,3 +186,22 @@ sketch-kit will create a `build/` folder containing a static build of the projec
 ## Contact
 
 [Kev Mayo](https://kevinmayo.com)  / [email](mailto:hello@kevinmayo.com)
+
+## Automated releases
+
+PRs targeting `main` run CI. After merging, the source branch determines the release:
+
+- `fix/*`: patch (for example, 1.7.2 becomes 1.7.3).
+- `feature/*`: minor (for example, 1.7.2 becomes 1.8.0).
+- Other branch names: no automatic release.
+
+The release job queues behind other releases, checks out current `main`, updates
+`package.json` and `package-lock.json`, and runs the build and tests. It then commits
+the version, pushes `main` and its `v<version>` tag atomically, and publishes to npm.
+A rerun resumes the existing release commit and skips a version already published.
+Closing an unmerged PR or manually pushing a tag does not publish.
+
+Configure the repository secret `NPM_TOKEN` with permission to publish `sketch-kit`.
+Repository rules must allow the workflow's `GITHUB_TOKEN` to push release commits
+to `main` and create version tags. If branch protection requires all changes through
+PRs, configure an allowed automation identity before enabling this release flow.
