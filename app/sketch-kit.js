@@ -35,11 +35,11 @@ export default class SketchKit {
     /**
      * Prompts for info and appends new sketch to sketches
      */
-    async create(args) {
+    async create(args, options = {}) {
         await this.update()
 
         var Create = await import('./create.js');
-        var create = new Create.default(this.config, args);
+        var create = new Create.default(this.config, args, options);
         return create.start();
     }
 
@@ -82,6 +82,12 @@ export default class SketchKit {
         const Run = await import('./run.js');
         const run = new Run.default(this.config, args);
         return run.start();
+    }
+
+    async delete(args, options = {}) {
+        await this.update();
+        const { default: Delete } = await import('./delete.js');
+        return new Delete(this.config, args, options).start();
     }
 
     async build(args) {

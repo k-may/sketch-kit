@@ -10,8 +10,9 @@ const templates = fileURLToPath(new URL('../templates/sketch/', import.meta.url)
 const scriptTemplates = new Map([['none', 'script.txt'], ['threejs', 'script_threejs.txt']]);
 
 export default class Create {
-    constructor(config, args = []) {
+    constructor(config, args = [], options = {}) {
         this._config = config;
+        this.options = options;
         this._args = args;
         this.root = path.resolve(config.root ?? 'sketch-kit');
     }
@@ -178,6 +179,22 @@ export default class Create {
             }
             if (sourceId !== null || replace) await this._assertModernStyles(sourceId ?? planned.id);
             const destination = this._paths(planned.id);
+            const action = replace ? 'Replace' : sourceId !== null ? 'Copy' : 'Create';
+            utils.message([
+                action + ' sketch: ' + planned.id,
+                'Author: ' + (replace ? planned.author ?? 'unspecified (unchanged)' : author),
+                sourceId !== null ? 'Source: ' + sourceId : 'Template: ' + (template === 'threejs' ? 'Three.js' : 'None'),
+                'Directory: ' + destination.directory,
+                'Registry: ' + this.configPath,
+                ...(replace ? ['All existing files in the sketch directory will be replaced. Branch metadata is preserved.'] : []),
+            ].join('\n'));
+            if (!this.options.yes && process.env.TEST !== 'true' && !this._config.debug && process.stdin.isTTY) {
+                const { confirmed } = await inquirer.prompt({
+                    type: 'confirm', name: 'confirmed', default: false,
+                    message: action + ' this sketch?',
+                });
+                if (!confirmed) return false;
+            }
             stage = await fs.mkdtemp(path.join(this.root, '.sketch-kit-stage-'));
             const stagedDirectory = path.join(stage, 'sketch');
             await fs.ensureDir(stagedDirectory);

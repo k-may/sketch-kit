@@ -13,6 +13,7 @@ function displayHelp() {
     console.log('\nCommands:');
     console.log('  init                                     Initialize Sketch-Kit');
     console.log('  create <name / copy> <copy => new name (optional)>      Create a new sketch');
+    console.log('  delete <name> [--yes]                    Delete a sketch');
     console.log('  run                                      Run Sketch-Kit');
 }
 
@@ -20,6 +21,7 @@ function displayHelp() {
 async function main() {
     var argv = minimist(process.argv.slice(2), {
         string: ['configFile'],
+        boolean: ['yes'],
         alias: {
             h: 'help', // Add an alias for the help option
             v: 'version'
@@ -44,7 +46,10 @@ async function main() {
 
         switch (action) {
             case 'create':
-                await s.create(args);
+                await s.create(args, { yes: argv.yes });
+                break;
+            case 'delete':
+                await s.delete(args, { yes: argv.yes });
                 break;
             case 'run':
                 await s.run(args, context);
