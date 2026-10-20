@@ -1,12 +1,24 @@
-import SketchKit from '../app/sketch-kit.js';
-import {assert} from 'chai';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
+import assert from 'node:assert/strict';
+import { before, after, describe, it } from 'node:test';
+import os from 'node:os';
 import fs from 'fs-extra';
 import path from 'path';
 import {SketchUtils} from "../templates/workspace/js/utils/SketchUtils.js";
 
-const sketchesPath = path.resolve(process.cwd(), 'sketch-kit');
+const execFileAsync = promisify(execFile);
+const moduleUrl = new URL('../app/sketch-kit.js', import.meta.url).href;
+let project;
+let sketchesPath;
 
-let sketches;
+async function runCommand(method, args = []) {
+    await execFileAsync(process.execPath, ['--input-type=module', '-e',
+        'import SketchKit from ' + JSON.stringify(moduleUrl) + '; ' +
+        'const kit = new SketchKit({ debug: true }); ' +
+        'await kit.' + method + '(' + JSON.stringify(args) + ');',
+    ], { cwd: project, env: { ...process.env, TEST: 'true' }, timeout: 60000 });
+}
 
 function generateRandomString(length) {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -21,10 +33,9 @@ function generateRandomString(length) {
 }
 
 //========================================================
-process.env.TEST = "true";
-
-before(() => {
-    sketches = new SketchKit({debug: true});
+before(async () => {
+    project = await fs.mkdtemp(path.join(os.tmpdir(), 'sketch-kit-cli-'));
+    sketchesPath = path.join(project, 'sketch-kit');
 });
 
 
@@ -34,16 +45,14 @@ describe('CLI Tests', () => {
 
     it('sketch-kit/ folder created', async () => {
 
-        await fs.remove(sketchesPath);
-
-        await sketches.init()
-        const folderExist = await fs.existsSync(sketchesPath);
+        await runCommand('init')
+        const folderExist = await fs.pathExists(sketchesPath);
         assert(folderExist, 'sketch-kit initialized');
 
     });
     it('sketch created', async () => {
 
-        await sketches.create(['test']);
+        await runCommand('create', ['test']);
 
         const sketchPath = path.join(sketchesPath, '/js/sketches/test');
         const folderExist = await fs.pathExists(sketchPath);
@@ -53,19 +62,19 @@ describe('CLI Tests', () => {
     });
     it('sketch copied', async () => {
 
-        await sketches.create(['test', 'forceCopy']);
+        await runCommand('create', ['test', 'forceCopy']);
 
         const sketchPath = path.join(sketchesPath, '/js/sketches/forceCopy');
-        const folderExist = await fs.existsSync(sketchPath);
+        const folderExist = await fs.pathExists(sketchPath);
 
         assert(folderExist, `sketch was copied : ${sketchPath} / exists : ${folderExist}`);
 
     });
 
     it("sketch-kit built", async () => {
-        await sketches.build();
+        await runCommand('build');
         const buildPath = path.join(sketchesPath, '/build');
-        const folderExist = await fs.existsSync(buildPath);
+        const folderExist = await fs.pathExists(buildPath);
         assert(folderExist, 'build folder exists');
     });
 });
@@ -92,5 +101,5 @@ describe("Sketches Tests", () => {
     });
 });
 after(async () => {
-    await fs.remove(sketchesPath);
+    if (project) await fs.remove(project);
 });
