@@ -1,0 +1,38 @@
+name: Prepare Release PR
+
+on:
+  pull_request:
+    branches: [main]
+    types: [closed]
+
+permissions:
+  contents: read
+
+jobs:
+  prepare:
+    if: >-
+      github.event.pull_request.merged == true &&
+      (startsWith(github.head_ref, 'fix/') || startsWith(github.head_ref, 'feature/'))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    concurrency:
+      group: npm-release-main
+      queue: max
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.RELEASE_PR_TOKEN || github.token }}
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Update release/next and open or refresh its PR
+        run: node scripts/prepare-release.mjs
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_PR_TOKEN || github.token }}
+          SOURCE_BRANCH: ${{ github.head_ref }}
+          MERGE_SHA: ${{ github.event.pull_request.merge_commit_sha }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}

@@ -1,0 +1,74 @@
+name: Publish Release
+
+on:
+  pull_request:
+    branches: [main]
+    types: [closed]
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    if: >-
+      github.event.pull_request.merged == true &&
+      github.head_ref == 'release/next' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: npm-release-main
+      queue: max
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          registry-url: https://registry.npmjs.org
+          cache: npm
+      - name: Validate merged release version
+        id: release
+        run: node scripts/validate-release.mjs
+      - name: Install, build, and test
+        run: |
+          npm ci
+          npm run build --if-present
+          npm test
+          node --test test/*.test.mjs
+        env:
+          CI: true
+      - name: Tag merged release commit
+        shell: bash
+        env:
+          VERSION: ${{ steps.release.outputs.version }}
+        run: |
+          set -euo pipefail
+          tag="v${VERSION}"
+          if git show-ref --verify --quiet "refs/tags/$tag"; then
+            test "$(git rev-list -n 1 "$tag")" = "$(git rev-parse HEAD)"
+          else
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git tag -a "$tag" -m "Release $tag"
+            git push origin "refs/tags/$tag"
+          fi
+      - name: Publish unless the version already exists
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          VERSION: ${{ steps.release.outputs.version }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          package=$(node -p "require('./package.json').name")
+          if npm view "${package}@${VERSION}" version --json > "$RUNNER_TEMP/npm-version.json" 2> "$RUNNER_TEMP/npm-error.log"; then
+            echo "${package}@${VERSION} is already published; skipping."
+          elif grep -q 'E404' "$RUNNER_TEMP/npm-error.log"; then
+            npm publish --access public
+          else
+            cat "$RUNNER_TEMP/npm-error.log" >&2
+            exit 1
+          fi
