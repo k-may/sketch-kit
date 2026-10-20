@@ -353,7 +353,8 @@ test('Vite serves colocated SCSS imports and sends style updates', async t => {
     const { createServer } = await import('vite');
     const server = await createServer({
         root, configFile: false, logLevel: 'error',
-        server: { host: '127.0.0.1', port: 0 },
+        // Polling keeps this integration test independent of native watcher timing on CI.
+        server: { host: '127.0.0.1', port: 0, watch: { usePolling: true, interval: 50 } },
     });
     t.after(() => server.close());
     await server.listen();
@@ -367,15 +368,28 @@ test('Vite serves colocated SCSS imports and sends style updates', async t => {
     assert.equal(cssResponse.status, 200);
     const css = await cssResponse.text();
     assert.match(css, /#fresh/);
+    const stylePath = path.join(root, 'js/sketches/fresh/fresh.scss');
+    const waitFor = async (condition, diagnostic) => {
+        const deadline = Date.now() + 10000;
+        while (!condition() && Date.now() < deadline) {
+            await new Promise(resolve => setTimeout(resolve, 25));
+        }
+        assert.ok(condition(), diagnostic());
+    };
+    // Serving a transform does not guarantee the initial filesystem scan has finished.
+    await waitFor(() => Object.entries(server.watcher.getWatched()).some(([directory, files]) =>
+        path.resolve(directory) === path.dirname(stylePath) && files.includes(path.basename(stylePath))),
+    () => 'Vite watcher did not register the SCSS file');
     const updates = [];
+    const changes = [];
+    server.watcher.on('change', file => changes.push(path.resolve(file)));
     const originalSend = server.ws.send.bind(server.ws);
     server.ws.send = (...args) => { updates.push(args[0]); return originalSend(...args); };
-    await fs.writeFile(path.join(root, 'js/sketches/fresh/fresh.scss'), '#fresh { color: rgb(12, 34, 56); }');
-    const deadline = Date.now() + 5000;
-    while (!updates.some(message => message.type === 'update') && Date.now() < deadline) {
-        await new Promise(resolve => setTimeout(resolve, 25));
-    }
-    assert.ok(updates.some(message => message.type === 'update' && message.updates.some(update => update.path === styleUrl)), 'Expected a style HMR update');
+    await fs.writeFile(stylePath, '#fresh { color: rgb(12, 34, 56); }');
+    await waitFor(() => updates.some(message => message?.type === 'update' &&
+        message.updates.some(update => update.path === styleUrl)),
+    () => 'Expected a style HMR update. ' + JSON.stringify({ changes, updates }));
+    assert.ok(changes.includes(stylePath), 'Expected a filesystem change for the SCSS file');
     const updated = await (await fetch(origin + styleUrl)).text();
     assert.match(updated, /12, 34, 56/);
 });
