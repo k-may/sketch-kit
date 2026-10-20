@@ -90,8 +90,7 @@ export default class Main {
      * @private
      */
     async _copyApp() {
-        var sketchKitPath = path.resolve(__dirname, '../');
-        sketchKitPath = path.join(sketchKitPath + '/lib/' + FOLDER_NAME);
+        const sketchKitPath = path.resolve(__dirname, '../templates/workspace');
         await fs.copy(sketchKitPath, './' + FOLDER_NAME);
     }
 
