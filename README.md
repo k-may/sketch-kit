@@ -148,6 +148,10 @@ sketch-kit starts a Vite development server with HMR on port 3002. Vite handles 
 
 sketch-kit will add a new sketch to your sketches and wil now be available in the menu. This sketch includes the base sketch view template and a colocated SCSS file scoped to the sketch element ID. Copying renames both primary files and updates their sketch references; extra files are copied unchanged.
 
+Interactive creation, copying, and replacement show a summary and ask for confirmation before writing files.
+The summary includes the sketch name, author, template or copy source, directory, and registry.
+Replacement also warns that existing sketch files will be replaced. Use `--yes` to skip confirmation; noninteractive creation stays prompt-free.
+
 New sketches prompt for an optional template: **None** (the default empty starter) or **Three.js**.
 Three.js sketches require `npm install three` in the host project. Noninteractive creation uses None.
 
@@ -155,6 +159,14 @@ If the sketch already exists, you'll be prompted to copy or replace, creating a 
 
 **Note;** give sketches unique names to ensure that there aren't conflicts when copying. The replace method will search through the code and indescriminately replace the sketch name with whatever the next sketch name will be
 
+
+### Delete
+
+`sketch-kit delete <name> [--yes]`
+
+Removes a sketch from the registry and deletes its entire directory, including extra files.
+Prompts for confirmation; use --yes for noninteractive commands. Delete child sketches first.
+Legacy styles must be migrated as described in [sketch styles and migration](docs/sass.md) before deletion.
 
 ### Build
 

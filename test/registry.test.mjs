@@ -409,6 +409,7 @@ test('interactive creation defaults to None and generates the empty starter', as
     const { root, command } = await fixture(t);
     await command._getConfig();
     t.mock.method(inquirer, 'prompt', async question => {
+        if (question.name === 'confirmed') return { confirmed: true };
         assert.equal(question.name, 'template');
         assert.equal(question.default, 'none');
         assert.deepEqual(question.choices.map(choice => choice.value), ['none', 'threejs']);
@@ -424,7 +425,7 @@ test('interactive Three.js selection substitutes names and uses standard Sass', 
     interactiveTerminal(t);
     const { root, command } = await fixture(t);
     await command._getConfig();
-    t.mock.method(inquirer, 'prompt', async () => ({ template: 'threejs' }));
+    t.mock.method(inquirer, 'prompt', async question => question.name === 'confirmed' ? { confirmed: true } : { template: 'threejs' });
     await command._tryCreateSketch('scene', 'author');
     const script = await fs.readFile(path.join(root, 'js/sketches/scene/scene.js'), 'utf8');
     assert.match(script, /from 'three'/);
@@ -455,10 +456,11 @@ test('replacement offers template selection and retains ancestry', async t => {
     const calls = [];
     t.mock.method(inquirer, 'prompt', async question => {
         calls.push(question.name);
+        if (question.name === 'confirmed') return { confirmed: true };
         return question.name === 'action' ? { action: 'replace' } : { template: 'threejs' };
     });
     await command._tryCreateSketch('motion', 'author');
-    assert.deepEqual(calls, ['action', 'template']);
+    assert.deepEqual(calls, ['action', 'template', 'confirmed']);
     assert.deepEqual(prepareRegistry(await read()).config, prepareRegistry(before).config);
     assert.match(await fs.readFile(path.join(root, 'js/sketches/motion/motion.js'), 'utf8'), /from 'three'/);
 });
@@ -481,4 +483,44 @@ test('noninteractive creation defaults to None without prompting', async t => {
     t.mock.method(inquirer, 'prompt', () => { throw new Error('Unexpected prompt'); });
     await command._tryCreateSketch('fresh', 'author');
     assert.doesNotMatch(await fs.readFile(path.join(root, 'js/sketches/fresh/fresh.js'), 'utf8'), /from 'three'/);
+});
+
+for (const action of ['create', 'copy', 'replace']) {
+    test(`declining ${action} summary leaves files and registry untouched`, async t => {
+        interactiveTerminal(t);
+        const { root, command, read } = await fixture(t);
+        const before = await read();
+        const original = await fs.readFile(path.join(root, 'js/sketches/motion/motion.js'), 'utf8');
+        const messages = [];
+        t.mock.method(console, 'log', (...args) => messages.push(args.join(' ')));
+        t.mock.method(inquirer, 'prompt', async question => {
+            assert.equal(question.name, 'confirmed');
+            assert.equal(question.default, false);
+            assert.equal(await fs.pathExists(path.join(root, '.sketch-kit-stage-')), false);
+            return { confirmed: false };
+        });
+        const result = await command._writeSketch({
+            id: action === 'replace' ? 'motion' : 'fresh', author: 'reviewer',
+            sourceId: action === 'copy' ? 'motion' : null, replace: action === 'replace',
+        });
+        assert.equal(result, false);
+        assert.deepEqual(await read(), before);
+        assert.equal(await fs.readFile(path.join(root, 'js/sketches/motion/motion.js'), 'utf8'), original);
+        assert.equal(await fs.pathExists(path.join(root, 'js/sketches/fresh')), false);
+        assert.equal(await fs.pathExists(path.join(root, '.sketch-kit-create.lock')), false);
+        assert.ok(!(await fs.readdir(root)).some(name => name.startsWith('.sketch-kit-stage-')));
+        const summary = messages.join('\n');
+        assert.match(summary, /Directory:/);
+        assert.match(summary, /Registry:/);
+        assert.match(summary, action === 'copy' ? /Source: motion/ : /Template: None/);
+        if (action === 'replace') assert.match(summary, /existing files.*replaced/);
+    });
+}
+
+test('--yes skips create confirmation in an interactive terminal', async t => {
+    interactiveTerminal(t);
+    const { command } = await fixture(t);
+    command.options.yes = true;
+    t.mock.method(inquirer, 'prompt', () => { throw new Error('Unexpected confirmation'); });
+    assert.equal(await command._createSketch('fresh', 'author'), 'fresh');
 });
